@@ -26,6 +26,147 @@ type Company = {
   created_at: string    // dd/mm/yyyy
 }
 
+export interface CompanyProfile {
+  status: string
+  id: number
+  cus_id: number
+  cus_name: string
+  emp_id: number
+  emp_name: string
+  process: string | null
+  metadata: Metadata
+}
+
+export interface Metadata {
+  type: number
+  general: {
+    provide: string
+    date: {
+      day: number
+      month: number
+      year: number
+    }
+  }
+  registration_index: number
+  company: CompanyInfo
+  owner: Person
+  representatives: Person[]
+  industries: Industry[]
+  tax: TaxInfo
+  ox_bhxh_1m: boolean
+  ox_bhxh_3m: boolean
+  ox_bhxh_6m: boolean
+}
+
+export interface CompanyInfo {
+  name: {
+    full: string
+    foreign: string
+    short: string
+  }
+  address: Address
+  contact: Contact
+  license: License
+  capital: Capital
+}
+
+export interface Address {
+  detail: string
+  ward: string
+  district: string
+  city: string
+  country: string
+}
+
+export interface Contact {
+  phone: string
+  fax: string
+  email: string
+  website: string
+}
+
+export interface License {
+  number: string
+  date: string
+  yn_land_use_cert: boolean | null
+  ox_kv_CN: boolean
+  ox_kv_CX: boolean
+  ox_kv_KT: boolean
+  ox_kv_CNC: boolean
+  ox_xahoi: boolean
+  ox_chungkhoan: boolean
+}
+
+export interface Capital {
+  amount: number
+  text: string
+  currency: string
+  yn_equivalent_value: boolean
+}
+
+export interface Person {
+  name: string
+  sex: string
+  position?: string
+  birthdate: string
+  ethnic: string
+  nationality: string
+  status:string
+  id: {
+    ox_cccd: boolean
+    ox_cmnd: boolean
+    ox_passport: boolean
+    ox_other: boolean
+    note: string
+    number: string
+    issue_date: string
+    issue_place: string
+    expiry_date: string
+  }
+  address: {
+    permanent: Location
+    contact: Location
+  }
+  contact: {
+    phone: string
+    email: string
+  }
+}
+
+export interface Location {
+  street: string
+  ward: string
+  district: string
+  city: string
+  country: string
+}
+
+export interface Industry {
+  is_main: boolean
+  code: string
+  description: string
+  note: string
+}
+
+export interface TaxInfo {
+  manager_name: string
+  manager_phone: string
+  accountant_name: string
+  accountant_phone: string
+  address: {
+    street: string
+    ward: string
+    district: string
+    city: string
+    phone: string
+    fax: string
+    email: string
+  }
+  date_start: string
+  finance_start: string
+  finance_end: string
+  num_employees: number
+}
 
 type ApiResponse = {
   id: string
@@ -76,12 +217,13 @@ export default function Smllc() {
           },
         });
   
-        const mapped = res.data.map((data: any) => {
+        const mapped = res.data.map((data:CompanyProfile) => {
           const date = data?.metadata?.general?.date;
           const formattedDate = date
             ? `${String(date.day).padStart(2, '0')}/${String(date.month).padStart(2, '0')}/${date.year}`
             : '';
-  
+          console.log(data);
+          
           return {
             id: data.id || '',
             name: data?.metadata?.company?.name?.full || '',

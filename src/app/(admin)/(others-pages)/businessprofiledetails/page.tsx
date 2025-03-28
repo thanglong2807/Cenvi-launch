@@ -9,16 +9,139 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components
 import Cookies from 'js-cookie'
 import { useSearchParams } from 'next/navigation'
 
-interface BusinessProfile {
-    id: string
-    metadata: any
+export interface BusinessProfile {
+  id: string
+  cus_id: number
+  cus_name: string
+  emp_id: number
+  emp_name: string
+  process: string | null
+  metadata: Metadata
 }
-interface Industry {
-    is_main: boolean
-    code: string
-    description: string
+
+export interface Metadata {
+  type: number
+  general: {
+    provide: string
+    date: {
+      day: number
+      month: number
+      year: number
+    }
+  }
+  registration_index: number
+  company: {
+    name: {
+      full: string
+      foreign: string
+      short: string
+    }
+    address: {
+      detail: string
+      ward: string
+      district: string
+      city: string
+      country: string
+    }
+    contact: {
+      phone: string
+      fax: string
+      email: string
+      website: string
+    }
+    license: {
+      number: string
+      date: string
+      yn_land_use_cert: boolean | null
+      ox_kv_CN: boolean
+      ox_kv_CX: boolean
+      ox_kv_KT: boolean
+      ox_kv_CNC: boolean
+      ox_xahoi: boolean
+      ox_chungkhoan: boolean
+    }
+    capital: {
+      amount: number
+      text: string
+      currency: string
+      yn_equivalent_value: boolean
+    }
+  }
+  owner: Person
+  representatives: Person[]
+  industries: Industry[]
+  tax: {
+    manager_name: string
+    manager_phone: string
+    accountant_name: string
+    accountant_phone: string
+    address: {
+      street: string
+      ward: string
+      district: string
+      city: string
+      phone: string
+      fax: string
+      email: string
+    }
+    date_start: string
+    finance_start: string
+    finance_end: string
+    num_employees: number
+  }
+  ox_bhxh_1m: boolean
+  ox_bhxh_3m: boolean
+  ox_bhxh_6m: boolean
+}
+
+export interface Person {
+  name: string
+  sex: string
+  position?: string
+  birthdate: string
+  ethnic: string
+  nationality: string
+  id: {
+    ox_cccd: boolean
+    ox_cmnd: boolean
+    ox_passport: boolean
+    ox_other: boolean
     note: string
+    number: string
+    issue_date: string
+    issue_place: string
+    expiry_date: string
+  }
+  address: {
+    permanent: {
+      street: string
+      ward: string
+      district: string
+      city: string
+      country: string
+    }
+    contact: {
+      street: string
+      ward: string
+      district: string
+      city: string
+      country: string
+    }
+  }
+  contact: {
+    phone: string
+    email: string
+  }
 }
+
+export interface Industry {
+  is_main: boolean
+  code: string
+  description: string
+  note: string
+}
+
+
 type Representative = {
     name: string
     sex: string
