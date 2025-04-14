@@ -2,25 +2,27 @@
 import Input from "@/components/form/input/InputField"
 import { BusinessProfile } from '../page'
 
+type CompanyState = {
+  fullName: string
+  shortName: string
+  email: string
+  foreign: string
+  detail: string
+  ward: string
+  district: string
+  city: string
+  country: string
+  phone: string
+  fax: string
+  website: string
+  amount: string
+  text: string
+  currency: string
+}
+
 interface CompanyInfoProps {
-  companyState: {
-    fullName: string
-    shortName: string
-    email: string
-    foreign: string
-    detail: string
-    ward: string
-    district: string
-    city: string
-    country: string
-    phone: string
-    fax: string
-    website: string
-    amount: string
-    text: string
-    currency: string
-  }
-  setCompanyState: (state: any) => void
+  companyState: CompanyState
+  setCompanyState: (state: CompanyState) => void
   isEditing: boolean
   typeBussiness: string
   general: {

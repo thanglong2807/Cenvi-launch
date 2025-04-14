@@ -2,19 +2,21 @@
 
 import Input from '@/components/form/input/InputField'
 
+type CompanyState = {
+  detail: string
+  ward: string
+  district: string
+  city: string
+  country: string
+  phone: string
+  email: string
+  fax: string
+  website: string
+}
+
 type Props = {
-  companyState: {
-    detail: string
-    ward: string
-    district: string
-    city: string
-    country: string
-    phone: string
-    email: string
-    fax: string
-    website: string
-  }
-  setCompanyState: (data: any) => void
+  companyState: CompanyState
+  setCompanyState: (data: CompanyState) => void
   isEditing: boolean
 }
 

@@ -146,6 +146,70 @@ export interface Industry {
   note: string
 }
 
+export interface Member {
+  name: string
+  sex: string
+  birthdate: string
+  ethnic: string
+  nationality: string
+  id_number: string
+  issue_place: string
+  issue_date: string
+  expiry_date: string
+  capital: {
+    amount: string
+  }
+  address: {
+    permanent: {
+      street: string
+      ward: string
+      district: string
+      city: string
+      country: string
+    }
+    contact: {
+      street: string
+      ward: string
+      district: string
+      city: string
+      country: string
+    }
+  }
+}
+
+const personToMember = (person: Person): Member => {
+  return {
+    name: person.name,
+    sex: person.sex,
+    birthdate: person.birthdate,
+    ethnic: person.ethnic,
+    nationality: person.nationality,
+    id_number: person.id.number,
+    issue_place: person.id.issue_place,
+    issue_date: person.id.issue_date,
+    expiry_date: person.id.expiry_date,
+    capital: {
+      amount: '0' // Default value since Person doesn't have capital
+    },
+    address: {
+      permanent: {
+        street: person.address.permanent.street,
+        ward: person.address.permanent.ward,
+        district: person.address.permanent.district,
+        city: person.address.permanent.city,
+        country: person.address.permanent.country
+      },
+      contact: {
+        street: person.address.contact.street,
+        ward: person.address.contact.ward,
+        district: person.address.contact.district,
+        city: person.address.contact.city,
+        country: person.address.contact.country
+      }
+    }
+  }
+}
+
 export default function BusinessProfileDetails() {
   const [profile, setProfile] = useState<BusinessProfile | null>(null)
   const [isEditing, setIsEditing] = useState(false)
@@ -182,84 +246,89 @@ export default function BusinessProfileDetails() {
   const [selectedMainIndex, setSelectedMainIndex] = useState<number | null>(null)
 
   // Thành viên
-  const [membersState, setMembersState] = useState<any[]>([])
-
-  // người đại diện pháp luật
+  const [membersState, setMembersState] = useState<Member[]>([])
   const [representativeState, setRepresentativeState] = useState<Person[]>([])
 
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
 
   useEffect(() => {
-    if (!id) return
-    
-    const fetchProfile = async () => {
-      try {
-        const token = Cookies.get('token')
-  
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/profile/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-    
-        const datas = await res.json()
-        const data = datas.find((item:any)=>item.id==id)
-        setProfile(data)
-        console.log(data);
-        
-        const businessTypeMap: Record<string, string> = {
-          '1': 'Trách nhiệm hữu hạn 1 thành viên',
-          '2': 'Trách nhiệm hữu hạn 2 thành viên',
-          '3': 'Công ty cổ phần',
-        }
-      
-        settypeBussiness(businessTypeMap[data.metadata.type] || 'Loại hình khác')
-  
-        const company = data.metadata.company
-        const tax = data.metadata.tax
-  
-        setIndustriesState(data.metadata.industries)
-  
-        const mainIdx = data.metadata.industries.findIndex((i: any) => i.is_main)
-        setSelectedMainIndex(mainIdx)
-  
-        setCompanyState({
-          fullName: company.name.full || '',
-          shortName: company.name.short || '',
-          foreign: company.name.foreign || '',
-          email: company.contact.email || '',
-          detail: company.address.detail,
-          ward: company.address.ward,
-          district: company.address.district,
-          city: company.address.city,
-          country: company.address.country,
-          phone: company.contact.phone,
-          fax: company.contact.fax,
-          website: company.contact.website,
-          amount: company.capital.amount,
-          text: company.capital.text,
-          currency: company.capital.currency,
-        })
-  
-        setTaxState({
-          address: `${tax.address.street}, ${tax.address.ward}, ${tax.address.district}, ${tax.address.city}`,
-          numEmployees: tax.num_employees || 0,
-          accountant: `${tax.accountant_name || ''} - ${tax.accountant_phone || ''}`,
-        })
-  
-        setMembersState(data.metadata.members || [])
-        setRepresentativeState(data.metadata.representatives || [])
-      } catch (err) {
-        console.error('❌ Error fetching profile:', err)
-      }
+    if (id) {
+      fetchProfile()
     }
-  
-    fetchProfile()
-  }, [])
+  }, [id])
+
+  const fetchProfile = async () => {
+    if (!id) return
+
+    try {
+      const token = Cookies.get('token')
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/profile/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch profile')
+      }
+
+      const data: BusinessProfile = await res.json()
+
+      // Set profile data
+      setProfile(data)
+
+      // Set company data
+      const { company } = data.metadata
+      setCompanyState({
+        fullName: company.name.full,
+        shortName: company.name.short,
+        email: company.contact.email,
+        foreign: company.name.foreign,
+        detail: company.address.detail,
+        ward: company.address.ward,
+        district: company.address.district,
+        city: company.address.city,
+        country: company.address.country,
+        phone: company.contact.phone,
+        fax: company.contact.fax,
+        website: company.contact.website,
+        amount: company.capital.amount.toString(),
+        text: company.capital.text,
+        currency: company.capital.currency
+      })
+
+      // Set tax data
+      const { tax } = data.metadata
+      setTaxState({
+        address: tax.address.street,
+        numEmployees: tax.num_employees,
+        accountant: tax.accountant_name
+      })
+
+      // Set industries data
+      setIndustriesState(data.metadata.industries)
+
+      // Set members data - convert Person[] to Member[]
+      setMembersState(data.metadata.representatives.map(personToMember))
+      setRepresentativeState([data.metadata.owner])
+
+      // Find main industry
+      const mainIndustryIndex = data.metadata.industries.findIndex(ind => ind.is_main)
+      setSelectedMainIndex(mainIndustryIndex >= 0 ? mainIndustryIndex : null)
+
+      const businessTypeMap: Record<string, string> = {
+        '1': 'Trách nhiệm hữ hạn 1 thành viên',
+        '2': 'Trách nhiệm hữ hạn 2 thành viên',
+        '3': 'Công ty cổ phần',
+      }
+      
+      settypeBussiness(businessTypeMap[data.metadata.type] || 'Loại hình khác')
+
+    } catch (error) {
+      console.error('Error fetching profile:', error)
+    }
+  }
 
   const handleUpdate = async () => {
     if (!profile) return
