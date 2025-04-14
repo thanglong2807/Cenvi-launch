@@ -44,12 +44,7 @@ export default function AccountantPage({ onClose, setStep, currentStep }: Accoun
         <div className=' min-h-[100%]' >
             <div className='flex justify-between'>
                 <h3 className=' text-xl '>Thông tin Cổ đông góp vốn  ( Bước {currentStep} )</h3>
-                <Button
-                    onClick={onClose}
-                    className=" text-gray-600 hover:text-black"
-                >
-                    ✕
-                </Button>
+              
             </div>
             <div className='content-center h-full'>
                 <div>

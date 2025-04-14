@@ -3,18 +3,10 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import Link from 'next/link'
-import Button from '@/components/ui/button/Button'
 import Input from '@/components/form/input/InputField'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table'
-import CompanyRegisterForm from '../../(ui-elements)/businessformationform/CompanyRegisterForm'
-import ContactPage from '../../(ui-elements)/businessformationform/ContactPage'
-import Addressform from '../../(ui-elements)/businessformationform/Addressform'
-import Shareholders from '../../(ui-elements)/businessformationform/Shareholders'
-import LegalRepresentativePage from '../../(ui-elements)/businessformationform/LegalRepresentative'
-import AccountantPage from '../../(ui-elements)/businessformationform/Accountant'
-import BusinessCodePage from '../../(ui-elements)/businessformationform/BusinessCode'
 import Cookies from 'js-cookie'
-
+import LoadingProgressCircle from '@/components/ui/loading/Loading'
 type Company = {
   id: string
   name: string
@@ -276,18 +268,18 @@ export default function Smllc() {
     setStep(1)
     setShowForm(true)
   }
-
+  if (!filteredCompanies.length)  return <div className='w-full h-[70vh] flex justify-center items-center'><LoadingProgressCircle percentage={90} duration={1000}/></div>
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Danh sách công ty</h2>
 
       {/* Header Action */}
       <div className="flex justify-between items-center">
-        <Button onClick={handleAddCompanyClick} className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-all">
+        <Link href='/smllc/addnewbusiness' className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-all">
           Thêm công ty
-        </Button>
+        </Link>
 
-        <div className="flex gap-2 mb-4 w-[600px]">
+        <div className="flex gap-2 mb-4 w-[600px] justify-end">
           <Input
             placeholder="🔍 Tìm kiếm công ty..."
             defaultValue={searchTerm}
@@ -331,7 +323,7 @@ export default function Smllc() {
               <TableCell className="px-4 py-2">{company.owner}</TableCell>
               <TableCell className="px-4 py-2">
                 <Link
-                  href={`/businessprofiledetails?id=${company.id}`}
+                  href={`/smllc/businessprofiledetails?id=${company.id}`}
                   className="text-blue-600 underline"
                   target="_blank"
                 >

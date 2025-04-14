@@ -5,6 +5,7 @@ import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import React from "react";
+import Script from "next/script";
 
 export default function AdminLayout({
   children,
@@ -34,6 +35,9 @@ export default function AdminLayout({
         {/* Page Content */}
         <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
       </div>
+      <div className="zalo-chat-widget" data-oaid="4577223626745863500" data-welcome-message="Heheheheheh" data-autopopup="0" data-width="" data-height=""></div>
+      <Script src="https://sp.zalo.me/plugins/sdk.js" strategy="lazyOnload" />
     </div>
+    
   );
 }

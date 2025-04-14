@@ -1,12 +1,35 @@
 // components/business-profile/CompanyInfo.tsx
 import Input from "@/components/form/input/InputField"
+import { BusinessProfile } from '../page'
 
-type Props = {
-  companyState: any
-  setCompanyState: any
+interface CompanyInfoProps {
+  companyState: {
+    fullName: string
+    shortName: string
+    email: string
+    foreign: string
+    detail: string
+    ward: string
+    district: string
+    city: string
+    country: string
+    phone: string
+    fax: string
+    website: string
+    amount: string
+    text: string
+    currency: string
+  }
+  setCompanyState: (state: any) => void
   isEditing: boolean
   typeBussiness: string
-  generalDate: { day: number; month: number; year: number }
+  general: {
+    date: {
+      day: number
+      month: number
+      year: number
+    }
+  }
 }
 
 export default function CompanyInfo({
@@ -14,18 +37,18 @@ export default function CompanyInfo({
   setCompanyState,
   isEditing,
   typeBussiness,
-  generalDate,
-}: Props) {
+  general
+}: CompanyInfoProps) {
   return (
     <section className="mt-5">
       <div className='flex align-middle justify-between'>
         <h2 className="text-xl font-semibold mb-4 ">📌 Thông tin công ty {typeBussiness}</h2>
-        <p><strong>Ngày ký hồ sơ:</strong> Ngày {generalDate.day} Tháng {generalDate.month} Năm {generalDate.year}</p>
+        <p><strong>Ngày ký hồ sơ:</strong> Ngày {general.date.day} Tháng {general.date.month} Năm {general.date.year}</p>
       </div>
 
       <div className='border rounded p-4 mb-4 bg-white shadow-sm space-y-2'>
-        <div className="flex  content-center items-center">
-          <strong className="">Tên công ty viết bằng tiếng Việt:</strong>
+        <div className="flex content-center items-center">
+          <strong className="">Tên công ty viết bằng tiếng Việt (ghi bằng chữ in hoa):</strong>
           <Input
             disabled={!isEditing}
             className='outline-0 focus:none border-0'
@@ -35,7 +58,7 @@ export default function CompanyInfo({
         </div>
 
         <div className="flex content-center items-center">
-          <strong className="">Tên tiếng nước ngoài:</strong>
+          <strong className="">Tên công ty viết bằng tiếng nước ngoài (nếu có)</strong>
           <Input
             disabled={!isEditing}
             className='outline-0 focus:none border-0'
@@ -45,7 +68,7 @@ export default function CompanyInfo({
         </div>
 
         <div className="flex content-center items-center">
-          <strong className="">Tên viết tắt:</strong>
+          <strong className="">Tên công ty viết tắt (nếu có)</strong>
           <Input
             disabled={!isEditing}
             className='outline-0 focus:none border-0'

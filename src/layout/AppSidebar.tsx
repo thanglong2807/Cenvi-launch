@@ -38,6 +38,11 @@ const navItems: NavItem[] = [
     path: "/calendar",
   },
   {
+    icon: <CalenderIcon />,
+    name: "Chat",
+    path: "https://oauth.zaloapp.com/v4/oa/permission?app_id=736818528445700466&redirect_uri=https%3A%2F%2Flocalhost%3A3000%2Fchat%2F",
+  },
+  {
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/profile",

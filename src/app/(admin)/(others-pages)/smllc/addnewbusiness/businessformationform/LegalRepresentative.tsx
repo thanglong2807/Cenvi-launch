@@ -6,6 +6,13 @@ import Button from '@/components/ui/button/Button';
 
 import { useEffect, useState } from 'react'
 
+interface FpoResponse<T> {
+  data: {
+    data: T[]
+  }
+}
+
+
 interface LegalRepresentativePageProps {
     onClose: () => void;
     setStep: (step: number) => void;
@@ -48,7 +55,7 @@ export default function LegalRepresentativePage({onClose, setStep, currentStep}:
 
     fetch('https://vn-public-apis.fpo.vn/provinces/getAll?limit=-1')
       .then(res => res.json())
-      .then(json => {
+      .then((json: FpoResponse<Province>) => {
         setProvinces(json.data.data)
       })
   }, [])
@@ -143,19 +150,15 @@ export default function LegalRepresentativePage({onClose, setStep, currentStep}:
     companyData.legalRepresentatives = representatives
     localStorage.setItem('companyData', JSON.stringify(companyData))
     setStep(5)
-    alert('Dữ liệu đã lưu vào Local Storage!')
+
   }
 
   return (
     <div className="representative-container">
          <div className='flex justify-between'>
         <h3 className=' text-xl '>Thông tin Người đại diện pháp luật  ( Bước {currentStep} )</h3>
-        <Button
-          onClick={onClose}
-          className=" text-gray-600 hover:text-black"
-        >
-          ✕
-        </Button>
+      
+
       </div>
      
 

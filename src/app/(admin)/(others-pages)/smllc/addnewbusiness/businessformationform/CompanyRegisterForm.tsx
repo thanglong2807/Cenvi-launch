@@ -12,22 +12,51 @@ interface CompanyRegisterFormProps {
   }
 const CompanyRegisterForm:React.FC<CompanyRegisterFormProps> = ({ onClose, setStep, currentStep }) => {
     const [showResults, setShowResults] = useState(false)
+    const [selectedLanguage, setSelectedLanguage] = useState('vi')
+    const [searchResultsCompanyRegister, setsearchResultsCompanyRegister] = useState<{is_duplicate: boolean} | null>(null)
 
     const handleNextClick = () => {
         setStep(2); // Chuyển sang step 2
-      };
+    };
 
+    const checkDuplicateBusinessName = async () => {
+        try {
+            const companyName = document.getElementById('namebussinessvietnam') as HTMLInputElement;
+        
+            
+            
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_ONRENDER}company/check-duplicate?limit=10`, {
+                
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ten: companyName.value,
+                    loai: selectedLanguage
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setsearchResultsCompanyRegister(data);
+                setShowResults(true);
+            } else {
+                console.error('Error checking company name');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    
     return (
        <>
      
                 <div className='flex justify-between'>
                     <h3 className=' text-xl '>Nhập tên công ty ( Bước {currentStep} )</h3>
-                    <button
-                        onClick={onClose}
-                        className=" text-gray-600 hover:text-black"
-                    >
-                        ✕
-                    </button>
+                   
                 </div>
 
 
@@ -62,29 +91,23 @@ const CompanyRegisterForm:React.FC<CompanyRegisterFormProps> = ({ onClose, setSt
 
                         <Label htmlFor="kiem-tra-trung">Kiểm tra trùng</Label>
                         <div className='flex justify-between gap-5'>
-                        <select className='w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700'> 
+                        <select 
+                            className='w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700'
+                            value={selectedLanguage}
+                            onChange={(e) => setSelectedLanguage(e.target.value)}
+                        > 
                             <option value="vi">Tên tiếng việt</option>
                             <option value="en">Tên tiếng anh</option>
-                            <option value="en">Tên viết tắt</option>
+                            <option value="abb">Tên viết tắt</option>
                         </select>
-                            <Button onClick={()=>setShowResults(true)} className='w-[140px]' >
+                            <Button onClick={checkDuplicateBusinessName} className='w-[140px]' >
                                 Kiểm tra
                             </Button >
                         </div>
 
-                        {showResults && (
+                        {showResults && searchResultsCompanyRegister && (
                             <div className="ket-qua">
-                                <p>Có 4 kết quả</p>
-                                <ul>
-                                    <li>
-                                        CÔNG TY CỔ PHẦN TƯ VẤN GIẢI PHÁP CENVI <br />
-                                        <span>en: CENVI .....</span>
-                                    </li>
-                                    <li>
-                                        CÔNG TY CỔ PHẦN MÔI TRƯỜNG CENVI <br />
-                                        <span>en: CENVI .....</span>
-                                    </li>
-                                </ul>
+                                {!searchResultsCompanyRegister.is_duplicate ? <p>Có công ty trùng tên</p> : <p>Không có công ty trùng tên</p>}  
                             </div>
                         )}
 

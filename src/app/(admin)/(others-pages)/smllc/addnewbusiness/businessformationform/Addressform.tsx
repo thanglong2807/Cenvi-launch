@@ -145,12 +145,7 @@ const fetchWards = async (districtCode: string) => {
     <>
       <div className='flex justify-between'>
                     <h3 className=' text-xl '>Địa chỉ doanh nghiệp ( Bước {currentStep} )</h3>
-                    <Button
-                        onClick={onClose}
-                        className=" text-gray-600 hover:text-black"
-                    >
-                        ✕
-                    </Button>
+                 
                 </div>
 
       <div className="mb-4">

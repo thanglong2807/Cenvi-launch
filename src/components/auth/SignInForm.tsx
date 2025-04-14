@@ -10,8 +10,9 @@ import React, { useState } from "react";
 import { useDispatch } from 'react-redux'
 import { setUser } from "@/redux/slices/authSlice";
 import Alert from "../ui/alert/Alert";
-import axiosInstance from "@/lib/axios"; // đảm bảo đã config baseURL
+
 import Cookies from 'js-cookie';
+
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
@@ -44,8 +45,9 @@ export default function SignInForm() {
       }
   
       const { token } = data;
-      console.log(token);
       
+      
+     
       // ✅ Lưu token vào cookie (giữ đăng nhập)
       Cookies.set('token', token, { path: '/', expires: 7 });
   
