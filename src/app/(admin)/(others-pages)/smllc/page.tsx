@@ -306,20 +306,6 @@ export default function Smllc() {
         </div>
       </div>
 
-      {/* Multi-step Form */}
-      {showForm && (
-        <div className="fixed inset-0 bg-[#10182870] flex items-center justify-center z-[99999]">
-          <div className="bg-white p-6 fl rounded shadow-md w-full max-w-3xl relative overflow-y-auto max-h-[80vh] min-h-[50vh]">
-            {step === 1 && <CompanyRegisterForm currentStep={step} setStep={setStep} onClose={() => setShowForm(false)} />}
-            {step === 2 && <ContactPage currentStep={step} setStep={setStep} onClose={() => setShowForm(false)} />}
-            {step === 3 && <Addressform currentStep={step} setStep={setStep} onClose={() => setShowForm(false)} />}
-            {step === 4 && <LegalRepresentativePage currentStep={step} setStep={setStep} onClose={() => setShowForm(false)} />}
-            {step === 5 && <Shareholders currentStep={step} setStep={setStep} onClose={() => setShowForm(false)} />}
-            {step === 6 && <AccountantPage currentStep={step} setStep={setStep} onClose={() => setShowForm(false)} />}
-            {step === 7 && <BusinessCodePage currentStep={step} setStep={setStep} onClose={() => setShowForm(false)} />}
-          </div>
-        </div>
-      )}
 
       {/* Table */}
       <Table className="min-w-full border border-gray-300 rounded shadow-sm bg-white">
