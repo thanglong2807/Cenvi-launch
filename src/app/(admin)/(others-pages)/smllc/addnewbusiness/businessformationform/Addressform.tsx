@@ -4,19 +4,41 @@ import Label from '@/components/form/Label'
 import Select from '@/components/form/Select'
 import Button from '@/components/ui/button/Button'
 import { useEffect, useState } from 'react'
-
+import Input from '@/components/form/input/InputField'
 
 interface Option {
   value: string
   label: string
 }
-interface AddressPageProps {
-    onClose: () => void;
-    setStep: (step: number) => void;
-    currentStep: number; // Optional
-  }
 
-export default function Addressform({ onClose, setStep, currentStep }:AddressPageProps) {
+interface AddressPageProps {
+  setStep: (step: number) => void
+  currentStep?: number
+}
+
+interface Province {
+  code: string
+  name: string
+}
+
+interface District {
+  code: string
+  name: string
+}
+
+interface Ward {
+  code: string
+  name: string
+}
+
+interface AddressData {
+  city: string
+  district: string
+  ward: string
+  address: string
+}
+
+export default function Addressform({ setStep, currentStep }: AddressPageProps) {
   const [provinces, setProvinces] = useState<Option[]>([])
   const [districts, setDistricts] = useState<Option[]>([])
   const [wards, setWards] = useState<Option[]>([])
@@ -26,11 +48,32 @@ export default function Addressform({ onClose, setStep, currentStep }:AddressPag
   const [selectedWard, setSelectedWard] = useState('')
   const [address, setAddress] = useState('')
 
+  const [isLoading, setIsLoading] = useState({
+    provinces: false,
+    districts: false,
+    wards: false
+  })
+  const [error, setError] = useState({
+    provinces: '',
+    districts: '',
+    wards: '',
+    address: ''
+  })
+
   useEffect(() => {
     const fetchProvinces = async () => {
+      setIsLoading(prev => ({ ...prev, provinces: true }))
+      setError(prev => ({ ...prev, provinces: '' }))
+      
       const cached = localStorage.getItem('provincesData')
       if (cached) {
-        setProvinces(JSON.parse(cached).map((p: any) => ({ value: p.code, label: p.name })))
+        try {
+          const parsedData: Province[] = JSON.parse(cached)
+          setProvinces(parsedData.map((p: Province) => ({ value: p.code, label: p.name })))
+        } catch {
+          setError(prev => ({ ...prev, provinces: 'Lỗi khi đọc dữ liệu từ cache' }))
+        }
+        setIsLoading(prev => ({ ...prev, provinces: false }))
         return
       }
 
@@ -38,12 +81,15 @@ export default function Addressform({ onClose, setStep, currentStep }:AddressPag
         const res = await fetch('https://vn-public-apis.fpo.vn/provinces/getAll?limit=-1')
         await new Promise(resolve => setTimeout(resolve, 500))
         const json = await res.json()
-        const data = json.data.data
-        const formatted = data.map((p: any) => ({ value: p.code, label: p.name }))
+        const data: Province[] = json.data.data
+        const formatted = data.map((p: Province) => ({ value: p.code, label: p.name }))
         setProvinces(formatted)
         localStorage.setItem('provincesData', JSON.stringify(data))
       } catch (error) {
+        setError(prev => ({ ...prev, provinces: 'Lỗi khi tải danh sách tỉnh' }))
         console.error('Lỗi khi tải danh sách tỉnh:', error)
+      } finally {
+        setIsLoading(prev => ({ ...prev, provinces: false }))
       }
     }
 
@@ -52,16 +98,27 @@ export default function Addressform({ onClose, setStep, currentStep }:AddressPag
 
   useEffect(() => {
     const fetchDistricts = async () => {
-      if (!selectedCity) return
+      if (!selectedCity) {
+        setDistricts([])
+        setWards([])
+        return
+      }
+
+      setIsLoading(prev => ({ ...prev, districts: true }))
+      setError(prev => ({ ...prev, districts: '' }))
+
       try {
         const res = await fetch(`https://vn-public-apis.fpo.vn/districts/getByProvince?provinceCode=${selectedCity}&limit=-1`)
         await new Promise(resolve => setTimeout(resolve, 500))
         const json = await res.json()
-        const data = json.data.data
-        const formatted = data.map((d: any) => ({ value: d.code, label: d.name }))
+        const data: District[] = json.data.data
+        const formatted = data.map((d: District) => ({ value: d.code, label: d.name }))
         setDistricts(formatted)
       } catch (error) {
+        setError(prev => ({ ...prev, districts: 'Lỗi khi tải danh sách quận/huyện' }))
         console.error('Lỗi khi tải danh sách quận/huyện:', error)
+      } finally {
+        setIsLoading(prev => ({ ...prev, districts: false }))
       }
     }
 
@@ -72,16 +129,26 @@ export default function Addressform({ onClose, setStep, currentStep }:AddressPag
 
   useEffect(() => {
     const fetchWards = async () => {
-      if (!selectedDistrict) return
+      if (!selectedDistrict) {
+        setWards([])
+        return
+      }
+
+      setIsLoading(prev => ({ ...prev, wards: true }))
+      setError(prev => ({ ...prev, wards: '' }))
+
       try {
         const res = await fetch(`https://vn-public-apis.fpo.vn/wards/getByDistrict?districtCode=${selectedDistrict}&limit=-1`)
         await new Promise(resolve => setTimeout(resolve, 500))
         const json = await res.json()
-        const data = json.data.data
-        const formatted = data.map((w: any) => ({ value: w.code, label: w.name }))
+        const data: Ward[] = json.data.data
+        const formatted = data.map((w: Ward) => ({ value: w.code, label: w.name }))
         setWards(formatted)
       } catch (error) {
+        setError(prev => ({ ...prev, wards: 'Lỗi khi tải danh sách phường/xã' }))
         console.error('Lỗi khi tải danh sách phường/xã:', error)
+      } finally {
+        setIsLoading(prev => ({ ...prev, wards: false }))
       }
     }
 
@@ -89,37 +156,12 @@ export default function Addressform({ onClose, setStep, currentStep }:AddressPag
     fetchWards()
   }, [selectedDistrict])
 
-  useEffect(() => {
-    const saved = {
-      city: selectedCity,
-      district: selectedDistrict,
-      ward: selectedWard,
-      address
-    }
-    localStorage.setItem('companyAddress', JSON.stringify(saved))
-  }, [selectedCity, selectedDistrict, selectedWard, address])
-
-  const fetchDistricts = async (provinceCode: string) => {
-  if (!provinceCode) return []
-  const res = await fetch(
-    `https://vn-public-apis.fpo.vn/districts/getByProvince?provinceCode=${provinceCode}&limit=-1`
-  )
-  const json = await res.json()
-  return json?.data?.data || []
-}
-
-const fetchWards = async (districtCode: string) => {
-  if (!districtCode) return []
-  const res = await fetch(
-    `https://vn-public-apis.fpo.vn/wards/getByDistrict?districtCode=${districtCode}&limit=-1`
-  )
-  const json = await res.json()
-  return json?.data?.data || []
-}
-
   const handleNext = () => {
     if (!selectedCity || !selectedDistrict || !selectedWard || !address.trim()) {
-      alert('Vui lòng điền đầy đủ thông tin địa chỉ!')
+      setError(prev => ({
+        ...prev,
+        address: !address.trim() ? 'Vui lòng nhập địa chỉ chi tiết' : ''
+      }))
       return
     }
 
@@ -127,75 +169,114 @@ const fetchWards = async (districtCode: string) => {
     const districtName = districts.find(d => d.value === selectedDistrict)?.label || ''
     const wardName = wards.find(w => w.value === selectedWard)?.label || ''
 
-    const existing = localStorage.getItem('companyData')
-    const companyData = existing ? JSON.parse(existing) : {}
-
-    companyData.companyAddress = {
+    const data: AddressData = {
       city: provinceName,
       district: districtName,
       ward: wardName,
       address: address.trim()
     }
 
-    localStorage.setItem('companyData', JSON.stringify(companyData))
-    
+    try {
+      const existing = localStorage.getItem('companyData')
+      const companyData = existing ? JSON.parse(existing) : {}
+      companyData.companyAddress = data
+      localStorage.setItem('companyData', JSON.stringify(companyData))
+      setStep(4)
+    } catch (error) {
+      console.error('Lỗi khi lưu dữ liệu:', error)
+    }
   }
 
+  const isFormValid = selectedCity && selectedDistrict && selectedWard && address.trim()
+
   return (
-    <>
-      <div className='flex justify-between'>
-                    <h3 className=' text-xl '>Địa chỉ doanh nghiệp ( Bước {currentStep} )</h3>
-                 
-                </div>
-
-      <div className="mb-4">
-        <Label className="mb-1 block text-sm font-medium">Tỉnh / Thành phố</Label>
-        <Select 
-        className='w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700' 
-          options={provinces}
-          placeholder="Chọn tỉnh/thành phố"
-          onChange={setSelectedCity}
-          defaultValue={selectedCity}
-        />
+    <div className="p-6 max-w-md mx-auto">
+      <div className='flex justify-between mb-6'>
+        <h3 className='text-xl'>Địa chỉ doanh nghiệp (Bước {currentStep})</h3>
       </div>
 
-      <div className="mb-4">
-        <Label className="mb-1 block text-sm font-medium">Quận / Huyện</Label>
-        <Select 
-        className='w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700' 
-          options={districts}
-          placeholder="Chọn quận/huyện"
-          onChange={setSelectedDistrict}
-          defaultValue={selectedDistrict}
-        />
+      <div className="space-y-4">
+        <div>
+          <Label className="block text-sm font-medium mb-2">Tỉnh / Thành phố</Label>
+          <div className={`relative ${isLoading.provinces ? 'opacity-50' : ''}`}>
+            <Select 
+              className='w-full'
+              options={provinces}
+              placeholder="Chọn tỉnh/thành phố"
+              onChange={setSelectedCity}
+              defaultValue={selectedCity}
+            />
+            {isLoading.provinces && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
+              </div>
+            )}
+          </div>
+          {error.provinces && <div className="text-red-500 text-sm mt-1">{error.provinces}</div>}
+        </div>
+
+        <div>
+          <Label className="block text-sm font-medium mb-2">Quận / Huyện</Label>
+          <div className={`relative ${isLoading.districts || !selectedCity ? 'opacity-50' : ''}`}>
+            <Select 
+              className='w-full'
+              options={districts}
+              placeholder="Chọn quận/huyện"
+              onChange={setSelectedDistrict}
+              defaultValue={selectedDistrict}
+            />
+            {isLoading.districts && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
+              </div>
+            )}
+          </div>
+          {error.districts && <div className="text-red-500 text-sm mt-1">{error.districts}</div>}
+        </div>
+
+        <div>
+          <Label className="block text-sm font-medium mb-2">Phường / Xã</Label>
+          <div className={`relative ${isLoading.wards || !selectedDistrict ? 'opacity-50' : ''}`}>
+            <Select
+              className='w-full'
+              options={wards}
+              placeholder="Chọn phường/xã"
+              onChange={setSelectedWard}
+              defaultValue={selectedWard}
+            />
+            {isLoading.wards && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
+              </div>
+            )}
+          </div>
+          {error.wards && <div className="text-red-500 text-sm mt-1">{error.wards}</div>}
+        </div>
+
+        <div>
+          <Label className="block text-sm font-medium mb-2">Địa chỉ chi tiết</Label>
+          <Input
+            type="text"
+            placeholder="Số nhà, tên đường..."
+            defaultValue={address}
+            onChange={(e) => setAddress(e.target.value)}
+            className="w-full"
+            error={!!error.address}
+          />
+          {error.address && <div className="text-red-500 text-sm mt-1">{error.address}</div>}
+        </div>
       </div>
 
-      <div className="mb-4">
-        <Label className="mb-1 block text-sm font-medium">Phường / Xã</Label>
-        <Select
-        className='w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700' 
-          options={wards}
-          placeholder="Chọn phường/xã"
-          onChange={setSelectedWard}
-          defaultValue={selectedWard}
-        />
+      <div className='flex gap-4 mt-6'>
+        <Button onClick={() => setStep(2)} className='w-full'>Back</Button>
+        <Button 
+          onClick={handleNext} 
+          className='w-full'
+          disabled={!isFormValid}
+        >
+          Next
+        </Button>
       </div>
-
-      <div className="mb-4">
-        <Label className="mb-1 block text-sm font-medium">Địa chỉ chi tiết</Label>
-        <input
-          type="text"
-          className="w-full rounded border px-3 py-2 text-sm"
-          placeholder="Số nhà, tên đường..."
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
-      </div>
-<div className='flex gap-5'>
-                <Button  onClick={()=>setStep(2)} className='mt-4 w-full' >  Back</Button>
-      <Button onClick={()=>setStep(4)} className='mt-4 w-full' >  Next</Button>
-
-</div>
-    </>
+    </div>
   )
 }

@@ -1,79 +1,101 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Button from '@/components/ui/button/Button';
 import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 
 interface AccountantPageProps {
-    onClose: () => void;
     setStep: (step: number) => void;
-    currentStep: number; // Optional
+    currentStep: number;
 }
 
-export default function AccountantPage({ onClose, setStep, currentStep }: AccountantPageProps) {
+interface AccountantData {
+    accountant: {
+        name: string;
+        phone: string;
+    };
+}
 
-    const [accountantName, setAccountantName] = useState('')
-    const [accountantPhone, setAccountantPhone] = useState('')
-    const [phoneError, setPhoneError] = useState('')
+export default function AccountantPage({ setStep, currentStep }: AccountantPageProps) {
+    const [accountantName, setAccountantName] = useState<string>('')
+    const [accountantPhone, setAccountantPhone] = useState<string>('')
+    const [phoneError, setPhoneError] = useState<string>('')
+    const [isFormValid, setIsFormValid] = useState<boolean>(false)
 
-    const validateForm = () => {
-        const phoneRegex = /^(0|\+84)[0-9]{9}$/ // bạn có thể chỉnh sửa theo format VN
-        if (accountantPhone && !phoneRegex.test(accountantPhone)) {
-            setPhoneError('Số điện thoại không hợp lệ')
-            return
-        }
+    useEffect(() => {
+        const phoneRegex = /^(0|\+84)[0-9]{9}$/
+        const isValid = !accountantPhone || phoneRegex.test(accountantPhone)
+        setPhoneError(isValid ? '' : 'Số điện thoại không hợp lệ')
+        setIsFormValid(isValid)
+    }, [accountantPhone])
 
-        setPhoneError('')
-        const data = {
+    const handleSubmit = () => {
+        if (!isFormValid) return
+
+        const data: AccountantData = {
             accountant: {
                 name: accountantName,
                 phone: accountantPhone
             }
         }
 
-        const existing = JSON.parse(localStorage.getItem('companyData') || '{}')
-        const updated = { ...existing, ...data }
-
-        localStorage.setItem('companyData', JSON.stringify(updated))
-        setStep(7)
-
+        try {
+            const existingData = localStorage.getItem('companyData')
+            const existing = existingData ? JSON.parse(existingData) : {}
+            const updated = { ...existing, ...data }
+            localStorage.setItem('companyData', JSON.stringify(updated))
+            setStep(7)
+        } catch (error) {
+            console.error('Error saving accountant data:', error)
+        }
     }
 
     return (
-        <div className=' min-h-[100%]' >
-            <div className='flex justify-between'>
-                <h3 className=' text-xl '>Thông tin Cổ đông góp vốn  ( Bước {currentStep} )</h3>
-              
+        <div className="p-6 max-w-md mx-auto">
+            <div className="flex justify-between mb-6">
+                <h3 className="text-xl">Thông tin Kế toán (Bước {currentStep})</h3>
             </div>
-            <div className='content-center h-full'>
+            
+            <div className="space-y-4">
                 <div>
-                    <Label>Họ và tên Người Phụ trách kế toán/Kế toán trưởng (Không bắt buộc)</Label>
+                    <Label htmlFor="accountantName">Họ và tên Người Phụ trách kế toán/Kế toán trưởng (Không bắt buộc)</Label>
                     <Input
                         type="text"
                         id="accountantName"
+                        name="accountantName"
                         placeholder="Nhập họ và tên"
                         defaultValue={accountantName}
                         onChange={(e) => setAccountantName(e.target.value)}
+                        className="w-full"
                     />
                 </div>
 
-                <div >
-                    <Label>Số điện thoại</Label>
+                <div>
+                    <Label htmlFor="accountantPhone">Số điện thoại</Label>
                     <Input
                         type="text"
                         id="accountantPhone"
+                        name="accountantPhone"
                         placeholder="Nhập số điện thoại"
                         defaultValue={accountantPhone}
                         onChange={(e) => setAccountantPhone(e.target.value)}
+                        className="w-full"
+                        error={!!phoneError}
                     />
-                    {phoneError && <div className="error" id="phoneError">{phoneError}</div>}
+                    {phoneError && <div className="text-red-500 text-sm mt-1">{phoneError}</div>}
                 </div>
+            </div>
 
-                <div className='flex gap-5'>
-                    <Button onClick={() => setStep(4)} className='mt-4 w-full' >  Back</Button>
-                    <Button onClick={validateForm} className='mt-4 w-full' >  Next</Button>
-                </div>
+            <div className="flex gap-4 mt-6">
+                <Button onClick={() => setStep(4)} className="w-full">Back</Button>
+                <Button 
+                    onClick={handleSubmit} 
+                    className="w-full"
+                    disabled={!isFormValid}
+                >
+                    Next
+                </Button>
             </div>
         </div>
     )

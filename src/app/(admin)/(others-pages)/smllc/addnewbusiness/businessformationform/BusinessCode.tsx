@@ -4,7 +4,7 @@ import Input from '@/components/form/input/InputField';
 import Button from '@/components/ui/button/Button';
 import { useState, useEffect, useRef } from 'react'
 interface BusinessCodePageProps {
-  onClose: () => void;
+
   setStep: (step: number) => void;
   currentStep: number; // Optional
 }
@@ -25,11 +25,10 @@ interface IndustryResponse {
   data: IndustryItem[]
 }
 
-export default function BusinessCodePage({ setStep, currentStep }: BusinessCodePageProps) {
+export default function BusinessCodePage({  setStep, currentStep }: BusinessCodePageProps) {
   const [businessCodes, setBusinessCodes] = useState<BusinessCode[]>([])
   const [industries, setIndustries] = useState<IndustryItem[]>([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedIndustry, setSelectedIndustry] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -37,6 +36,9 @@ export default function BusinessCodePage({ setStep, currentStep }: BusinessCodeP
     const fetchIndustries = async () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_ONRENDER}industry/4`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch industries')
+        }
         const data: IndustryResponse = await response.json()
         setIndustries(data.data)
       } catch (error) {
@@ -74,34 +76,6 @@ export default function BusinessCodePage({ setStep, currentStep }: BusinessCodeP
     setShowDropdown(true)
   }
 
-  const handleAddCode = () => {
-    if (!selectedIndustry) return
-
-    const selected = industries.find(i => i.code === selectedIndustry)
-    if (!selected) return
-
-    const existing = businessCodes.find((b) => b.code === selected.code)
-    if (existing) return alert('Mã ngành đã tồn tại')
-
-    const newCode: BusinessCode = {
-      code: selected.code,
-      title: selected.name,
-      isRestricted: false
-    }
-
-    const updatedList = [...businessCodes, newCode]
-    setBusinessCodes(updatedList)
-
-    const current = JSON.parse(localStorage.getItem('companyData') || '{}')
-    localStorage.setItem(
-      'companyData',
-      JSON.stringify({ ...current, businessCodes: updatedList })
-    )
-
-    setSelectedIndustry('')
-    setSearchTerm('')
-  }
-
   const handleRemoveCode = (code: string) => {
     const updatedList = businessCodes.filter((b) => b.code !== code)
     setBusinessCodes(updatedList)
@@ -114,9 +88,9 @@ export default function BusinessCodePage({ setStep, currentStep }: BusinessCodeP
   }
 
   return (
-    <div className="p-6  mx-auto">
+    <div className="p-6 max-w-md mx-auto">
       <div className='flex justify-between'>
-        <h3 className=' text-xl '>Mã ngành nghề  ( Bước {currentStep} )</h3>
+        <h3 className='text-xl'>Mã ngành nghề (Bước {currentStep})</h3>
       </div>
       <div>
         <label className="block font-medium mb-2">Nhập Mã ngành nghề</label>
@@ -133,7 +107,7 @@ export default function BusinessCodePage({ setStep, currentStep }: BusinessCodeP
             </div>
             {showDropdown && (
               <div className='relative'>
-                <ul className=' h-[300px] overflow-y-auto absolute top-0 left-0 bg-white border rounded shadow-lg z-10'>
+                <ul className='w-[380px] h-[300px] overflow-y-auto absolute top-0 left-0 bg-white border rounded shadow-lg z-10'>
                   {filteredIndustries.length > 0 ? (
                     filteredIndustries.map((industry, index) => (
                       <li
@@ -177,19 +151,13 @@ export default function BusinessCodePage({ setStep, currentStep }: BusinessCodeP
               </div>
             )}
           </div>
-          <Button
-            onClick={handleAddCode}
-            className="bg-gray-400 text-white px-4 py-2 rounded h-[84px]"
-          >
-            Thêm
-          </Button>
         </div>
 
         <div className="bg-gray-200 p-4 rounded space-y-4">
           {businessCodes.map((item) => (
             <div key={item.code} className="flex justify-between items-start bg-white p-3 rounded shadow">
               <div>
-                <p className="font-semibold">{item.code} {item.title}...</p>
+                <p className="font-semibold">{item.code} {item.title}</p>
                 {item.isRestricted && (
                   <p className="text-sm text-red-600 mt-1">Lưu ý: ngành nghề kinh doanh có điều kiện</p>
                 )}
@@ -205,9 +173,9 @@ export default function BusinessCodePage({ setStep, currentStep }: BusinessCodeP
           {businessCodes.length === 0 && <p className="text-gray-500">Chưa có mã ngành nào</p>}
         </div>
       </div>
-      <div className='flex gap-5'>
-        <Button onClick={() => setStep(3)} className='mt-4 w-full' >  Back</Button>
-        <Button onClick={() => setStep(0)} className='mt-4 w-full' >  Next</Button>
+      <div className='flex gap-5 mt-4'>
+        <Button onClick={() => setStep(3)} className='w-full'>Back</Button>
+        <Button onClick={() => setStep(0)} className='w-full'>Next</Button>
       </div>
     </div>
   )

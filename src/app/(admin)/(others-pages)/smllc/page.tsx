@@ -7,6 +7,7 @@ import Input from '@/components/form/input/InputField'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table'
 import Cookies from 'js-cookie'
 import LoadingProgressCircle from '@/components/ui/loading/Loading'
+
 type Company = {
   id: string
   name: string
@@ -160,64 +161,42 @@ export interface TaxInfo {
   num_employees: number
 }
 
-type ApiResponse = {
-  id: string
-  emp_name: string
-  status: string
-  userwf: string
-  created_at: string
-  cus_name: string
-  metadata: {
-    general:{
-      date: {
-          day: number,
-          month: number,
-          year: number
-        }
-    }
-    company: {
-      name: { full: string }
-      address: {
-        detail: string
-      }
-    }
-  }
-}
+type StatusFilter = 'Tất cả' | 'Đang xử lý' | 'Đã duyệt' | 'Đã hủy'
 
 export default function Smllc() {
   const [companies, setCompanies] = useState<Company[]>([])
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState<'Tất cả' | 'Đang xử lý' | 'Đã duyệt' | 'Đã hủy'>('Tất cả')
-
-  const [showForm, setShowForm] = useState(false)
-  const [step, setStep] = useState(1)
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('Tất cả')
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   // Fetch data
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const token = Cookies.get('token');
+        setIsLoading(true)
+        setError(null)
+        const token = Cookies.get('token')
         if (!token) {
-          console.warn('⚠️ Không có token. Không thể lấy dữ liệu.');
-          return;
+          setError('⚠️ Không có token. Không thể lấy dữ liệu.')
+          return
         }
-  
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/profile/`, {
+
+        const res = await axios.get<CompanyProfile[]>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/profile/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });
-  
-        const mapped = res.data.map((data:CompanyProfile) => {
-          const date = data?.metadata?.general?.date;
+        })
+
+        const mapped = res.data.map((data: CompanyProfile) => {
+          const date = data?.metadata?.general?.date
           const formattedDate = date
             ? `${String(date.day).padStart(2, '0')}/${String(date.month).padStart(2, '0')}/${date.year}`
-            : '';
-          console.log(data);
-          
+            : ''
+
           return {
-            id: data.id || '',
+            id: data.id?.toString() || '',
             name: data?.metadata?.company?.name?.full || '',
             address: data?.metadata?.company?.address?.detail || '',
             owner: data?.cus_name || '',
@@ -225,20 +204,22 @@ export default function Smllc() {
             status: data?.status || '',
             profile: '',
             created_at: formattedDate,
-          };
-        });
-  
-        setCompanies(mapped);
-        setFilteredCompanies(mapped);
-      } catch (err: any) {
-        console.error('❌ Error fetching companies:', err.message || err);
+          }
+        })
+
+        setCompanies(mapped)
+        setFilteredCompanies(mapped)
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra khi tải dữ liệu'
+        setError(errorMessage)
+        console.error('❌ Error fetching companies:', errorMessage)
+      } finally {
+        setIsLoading(false)
       }
-    };
-  
-    fetchCompanies();
-  }, []);
-  
-  
+    }
+
+    fetchCompanies()
+  }, [])
 
   // Filter logic
   useEffect(() => {
@@ -256,19 +237,14 @@ export default function Smllc() {
     setFilteredCompanies(filtered)
   }, [searchTerm, statusFilter, companies])
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr)
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const year = date.getFullYear()
-    return `${day}/${month}/${year}`
+  if (isLoading) {
+    return <div className='w-full h-[70vh] flex justify-center items-center'><LoadingProgressCircle percentage={90} duration={1000}/></div>
   }
 
-  const handleAddCompanyClick = () => {
-    setStep(1)
-    setShowForm(true)
+  if (error) {
+    return <div className="p-4 text-red-500">{error}</div>
   }
-  if (!filteredCompanies.length)  return <div className='w-full h-[70vh] flex justify-center items-center'><LoadingProgressCircle percentage={90} duration={1000}/></div>
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Danh sách công ty</h2>
@@ -287,7 +263,7 @@ export default function Smllc() {
           />
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as any)}
+            onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
             className="border rounded px-3 py-2 text-sm text-gray-700"
           >
             <option value="Tất cả">Tất cả trạng thái</option>
@@ -297,7 +273,6 @@ export default function Smllc() {
           </select>
         </div>
       </div>
-
 
       {/* Table */}
       <Table className="min-w-full border border-gray-300 rounded shadow-sm bg-white">

@@ -29,6 +29,5 @@ export interface InputProps {
 // Modal component props
 export interface ModalProps extends BaseProps {
   isOpen: boolean;
-  onClose: () => void;
   title?: string;
 }

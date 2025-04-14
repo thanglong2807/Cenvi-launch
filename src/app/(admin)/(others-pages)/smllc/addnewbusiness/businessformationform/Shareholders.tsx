@@ -6,7 +6,7 @@ import Button from '@/components/ui/button/Button';
 import { useEffect, useState } from 'react'
 
 interface ShareholdersProps {
-  onClose: () => void;
+  
   setStep: (step: number) => void;
   currentStep: number; // Optional
 }
@@ -33,7 +33,7 @@ interface Province {
   name: string
 }
 
-export default function ShareholdersPage({ onClose, setStep, currentStep }: ShareholdersProps) {
+export default function ShareholdersPage({  setStep, currentStep }: ShareholdersProps) {
   const [charterCapital, setCharterCapital] = useState<number>(0)
   const [individualCount, setIndividualCount] = useState(0)
   const [organizationCount, setOrganizationCount] = useState(0)
@@ -96,7 +96,7 @@ export default function ShareholdersPage({ onClose, setStep, currentStep }: Shar
   const handleUpdateShareholder = async (
     id: string,
     field: keyof Shareholder | 'permanent' | 'current',
-    value: any,
+    value: string,
     subfield?: keyof Address
   ) => {
     const updated = await Promise.all(

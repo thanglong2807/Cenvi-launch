@@ -14,7 +14,7 @@ interface FpoResponse<T> {
 
 
 interface LegalRepresentativePageProps {
-    onClose: () => void;
+   
     setStep: (step: number) => void;
     currentStep: number; // Optional
   }
@@ -38,7 +38,7 @@ interface Province {
   name: string
 }
 
-export default function LegalRepresentativePage({onClose, setStep, currentStep}:LegalRepresentativePageProps) {
+export default function LegalRepresentativePage({ setStep, currentStep}:LegalRepresentativePageProps) {
   const [count, setCount] = useState(0)
   const [representatives, setRepresentatives] = useState<Representative[]>([])
   const [businessType, setBusinessType] = useState('Khác')
@@ -110,18 +110,17 @@ export default function LegalRepresentativePage({onClose, setStep, currentStep}:
   const updateRepresentative = (
     index: number,
     field: keyof Representative | 'permanentAddress' | 'currentAddress',
-    value: any,
-    subfield?: keyof Address
+    value: string | Partial<Address>
   ) => {
     setRepresentatives(prev => {
-      const updated:any = [...prev]
+      const updated: Representative[] = [...prev]
       if (field === 'permanentAddress' || field === 'currentAddress') {
         updated[index][field] = {
           ...updated[index][field],
-          ...value
+          ...(value as Partial<Address>)
         }
       } else {
-        updated[index][field] = value
+        (updated[index][field as keyof Representative] as string) = value as string
       }
       return updated
     })

@@ -12,6 +12,7 @@ import { setUser } from "@/redux/slices/authSlice";
 import Alert from "../ui/alert/Alert";
 
 import Cookies from 'js-cookie';
+import axios from 'axios';
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,38 +28,24 @@ export default function SignInForm() {
   const handleLogin = async () => {
     setError("");
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login/`,
+        {
           user_login: email,
           password: password,
-        }),
-      });
-  
-      const data = await res.json();
-  
-      if (!res.ok || data.status !== 'success') {
-        throw new Error(data.message || 'Login failed');
-      }
-  
-      const { token } = data;
-      
-      
-     
-      // ✅ Lưu token vào cookie (giữ đăng nhập)
+        }
+      );
+
+      const { token } = response.data;
       Cookies.set('token', token, { path: '/', expires: 7 });
-  
-      // ✅ Cập nhật redux nếu cần
       dispatch(setUser({ token }));
-  
-      // ✅ Điều hướng sau khi đăng nhập thành công
       router.push(redirectTo);
-    } catch (err: any) {
-      console.error('Login error:', err);
-      setError(err.message || 'Đăng nhập thất bại!');
+    } catch (err: Error | unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An error occurred during sign in');
+      }
     }
   };
   return (

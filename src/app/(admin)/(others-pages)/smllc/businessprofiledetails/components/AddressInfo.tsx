@@ -1,18 +1,9 @@
 import Input from '@/components/form/input/InputField'
+import { CompanyState } from '../types'
 
 interface AddressInfoProps {
-  companyState: {
-    detail: string
-    ward: string
-    district: string
-    city: string
-    country: string
-    phone: string
-    fax: string
-    website: string
-    email: string
-  }
-  setCompanyState: (state: any) => void
+  companyState: CompanyState
+  setCompanyState: (state: CompanyState) => void
   isEditing: boolean
 }
 

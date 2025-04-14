@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import Cookies from 'js-cookie'
 import { useSearchParams } from 'next/navigation'
@@ -13,6 +13,7 @@ import CapitalInfo from './components/CapitalInfo'
 import MemberInfo from './components/MemberInfo'
 import RepresentativeInfo from './components/RepresentativeInfo'
 import TaxInfo from './components/TaxInfo'
+import { CompanyState, CapitalState } from './types'
 
 export interface BusinessProfile {
   id: string
@@ -216,22 +217,25 @@ export default function BusinessProfileDetails() {
   const [typeBussiness, settypeBussiness] = useState('')
   
   // Công ty
-  const [companyState, setCompanyState] = useState({
+  const [companyState, setCompanyState] = useState<CompanyState>({
     fullName: '',
     shortName: '',
     email: '',
-    foreign: "",
+    foreign: '',
     detail: '',
-    ward: "",
+    ward: '',
     district: '',
     city: '',
-    country: "",
-    phone: "",
-    fax: "",
-    website: "",
-    amount: "",
-    text: "",
-    currency: ""
+    country: '',
+    phone: '',
+    fax: '',
+    website: ''
+  })
+
+  const [capitalState, setCapitalState] = useState<CapitalState>({
+    amount: '',
+    text: '',
+    currency: ''
   })
 
   // Thuế
@@ -252,13 +256,7 @@ export default function BusinessProfileDetails() {
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
 
-  useEffect(() => {
-    if (id) {
-      fetchProfile()
-    }
-  }, [id])
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!id) return
 
     try {
@@ -274,8 +272,6 @@ export default function BusinessProfileDetails() {
       }
 
       const data: BusinessProfile = await res.json()
-
-      // Set profile data
       setProfile(data)
 
       // Set company data
@@ -292,10 +288,7 @@ export default function BusinessProfileDetails() {
         country: company.address.country,
         phone: company.contact.phone,
         fax: company.contact.fax,
-        website: company.contact.website,
-        amount: company.capital.amount.toString(),
-        text: company.capital.text,
-        currency: company.capital.currency
+        website: company.contact.website
       })
 
       // Set tax data
@@ -328,7 +321,13 @@ export default function BusinessProfileDetails() {
     } catch (error) {
       console.error('Error fetching profile:', error)
     }
-  }
+  }, [id])
+
+  useEffect(() => {
+    if (id) {
+      fetchProfile()
+    }
+  }, [id, fetchProfile])
 
   const handleUpdate = async () => {
     if (!profile) return
@@ -445,6 +444,8 @@ export default function BusinessProfileDetails() {
       <CompanyInfo
         companyState={companyState}
         setCompanyState={setCompanyState}
+        capitalState={capitalState}
+        setCapitalState={setCapitalState}
         isEditing={isEditing}
         typeBussiness={typeBussiness}
         general={profile.metadata.general}
@@ -467,8 +468,8 @@ export default function BusinessProfileDetails() {
       />
 
       <CapitalInfo
-        companyState={companyState}
-        setCompanyState={setCompanyState}
+        companyState={capitalState}
+        setCompanyState={setCapitalState}
         isEditing={isEditing}
       />
 

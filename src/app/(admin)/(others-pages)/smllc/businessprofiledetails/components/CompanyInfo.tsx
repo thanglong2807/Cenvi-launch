@@ -1,42 +1,22 @@
 // components/business-profile/CompanyInfo.tsx
 import Input from "@/components/form/input/InputField"
-import { BusinessProfile } from '../page'
-
-type CompanyState = {
-  fullName: string
-  shortName: string
-  email: string
-  foreign: string
-  detail: string
-  ward: string
-  district: string
-  city: string
-  country: string
-  phone: string
-  fax: string
-  website: string
-  amount: string
-  text: string
-  currency: string
-}
+import { CompanyState, CapitalState, GeneralInfo } from '../types'
 
 interface CompanyInfoProps {
   companyState: CompanyState
   setCompanyState: (state: CompanyState) => void
+  capitalState: CapitalState
+  setCapitalState: (state: CapitalState) => void
   isEditing: boolean
   typeBussiness: string
-  general: {
-    date: {
-      day: number
-      month: number
-      year: number
-    }
-  }
+  general: GeneralInfo
 }
 
 export default function CompanyInfo({
   companyState,
   setCompanyState,
+  capitalState,
+  setCapitalState,
   isEditing,
   typeBussiness,
   general
@@ -94,8 +74,8 @@ export default function CompanyInfo({
           <Input
             disabled={!isEditing}
             className='outline-0 focus:none border-0'
-            defaultValue={companyState.amount}
-            onChange={(e) => setCompanyState({ ...companyState, amount: e.target.value })}
+            defaultValue={capitalState.amount}
+            onChange={(e) => setCapitalState({ ...capitalState, amount: e.target.value })}
           />
         </div>
       </div>

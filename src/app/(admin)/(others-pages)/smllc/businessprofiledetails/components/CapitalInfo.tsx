@@ -1,12 +1,9 @@
 import Input from '@/components/form/input/InputField'
+import { CapitalState } from '../types'
 
 interface CapitalInfoProps {
-  companyState: {
-    amount: string
-    text: string
-    currency: string
-  }
-  setCompanyState: (state: any) => void
+  companyState: CapitalState
+  setCompanyState: (state: CapitalState) => void
   isEditing: boolean
 }
 

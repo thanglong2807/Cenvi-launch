@@ -6,11 +6,10 @@ import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import Button from '@/components/ui/button/Button';
 interface ContactPageProps {
-    onClose: () => void;
     setStep: (step: number) => void;
     currentStep: number; // Optional
 }
-export default function ContactPage({ onClose, setStep, currentStep }: ContactPageProps) {
+export default function ContactPage({ setStep, currentStep }: ContactPageProps) {
 
     const [phone, setPhone] = useState('')
     const [fax, setFax] = useState('')
@@ -18,9 +17,7 @@ export default function ContactPage({ onClose, setStep, currentStep }: ContactPa
     const [website, setWebsite] = useState('')
     const [phoneError, setPhoneError] = useState('')
     const [emailError, setEmailError] = useState('')
-    const handleNextClick = () => {
-        setStep(3);
-    };
+   
 
 
     const handleSubmit = () => {
@@ -42,7 +39,7 @@ export default function ContactPage({ onClose, setStep, currentStep }: ContactPa
 
         if (isValid) {
             alert('Thông tin đã được gửi!')
-            // Xử lý dữ liệu tại đây
+            setStep(3)
         }
     }
 
@@ -106,7 +103,7 @@ export default function ContactPage({ onClose, setStep, currentStep }: ContactPa
             <div className='flex gap-5'>
 
                 <Button onClick={() => setStep(1)} className='mt-4 w-full' >  Back</Button>
-                <Button onClick={() => setStep(3)} className='mt-4 w-full' >  Next</Button>
+                <Button onClick={handleSubmit} className='mt-4 w-full' >  Next</Button>
             </div>
         </>
     )

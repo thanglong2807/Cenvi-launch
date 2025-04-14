@@ -6,11 +6,10 @@ import Button from '@/components/ui/button/Button'
 import React, { useState } from 'react'
 
 interface CompanyRegisterFormProps {
-    onClose: () => void;
     setStep: (step: number) => void;
     currentStep: number; // Optional
   }
-const CompanyRegisterForm:React.FC<CompanyRegisterFormProps> = ({ onClose, setStep, currentStep }) => {
+const CompanyRegisterForm:React.FC<CompanyRegisterFormProps> = ({  setStep, currentStep }) => {
     const [showResults, setShowResults] = useState(false)
     const [selectedLanguage, setSelectedLanguage] = useState('vi')
     const [searchResultsCompanyRegister, setsearchResultsCompanyRegister] = useState<{is_duplicate: boolean} | null>(null)
@@ -127,7 +126,7 @@ const CompanyRegisterForm:React.FC<CompanyRegisterFormProps> = ({ onClose, setSt
                 </div>
                 <div className='flex gap-5'>
 
-                <Button  onClick={onClose} className='mt-4 w-full' >  Cancel</Button>
+                <Button className='mt-4 w-full' >  Cancel</Button>
                 <Button onClick={handleNextClick} className='mt-4 w-full' >  Next</Button>
                 </div>
                 </>

@@ -11,8 +11,23 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 
+interface ZaloUser {
+  id: string;
+  avatar: string;
+  name: string;
+  status: string;
+}
+
+interface ZaloApiResponse {
+  data: {
+    followers: Array<{
+      user_id: string;
+      display_name: string;
+    }>;
+  };
+}
+
 export default function ChatPage() {
-  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -74,7 +89,7 @@ export default function ChatPage() {
 
   const getZaloUsers = async () => {
     try {
-      const response = await axios.get('https://openapi.zalo.me/v3.0/oa/user/getlist', {
+      const response = await axios.get<ZaloApiResponse>('https://openapi.zalo.me/v3.0/oa/user/getlist', {
         params: {
           data: JSON.stringify({
             offset: 0,
@@ -89,21 +104,31 @@ export default function ChatPage() {
       });
       
       if (response.data.data?.followers) {
-        const zaloUsers = response.data.data.followers.map((user: any) => ({
+        const zaloUsers: ZaloUser[] = response.data.data.followers.map(user => ({
           id: user.user_id,
+          avatar: '',
           name: user.display_name || 'Unknown User',
+          status: ''
+        }));
+        const users: User[] = zaloUsers.map(user => ({
+          id: user.id,
+          name: user.name,
           lastMessage: '',
           lastSeen: new Date().toLocaleTimeString(),
           online: true,
-          zaloLink: `https://zalo.me/${user.user_id}`
+          zaloLink: `https://zalo.me/${user.id}`
         }));
-        setUsers(zaloUsers);
-        if (zaloUsers.length > 0 && !selectedUser) {
-          setSelectedUser(zaloUsers[0]);
+        setUsers(users);
+        if (users.length > 0 && !selectedUser) {
+          setSelectedUser(users[0]);
         }
       }
     } catch (error) {
-      console.error('Error getting Zalo users:', error);
+      if (error instanceof Error) {
+        console.error('Error fetching Zalo users:', error.message);
+      } else {
+        console.error('Error fetching Zalo users');
+      }
     }
   };
 

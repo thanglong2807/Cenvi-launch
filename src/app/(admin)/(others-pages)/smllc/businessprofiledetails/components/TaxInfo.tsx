@@ -1,12 +1,14 @@
 import Input from '@/components/form/input/InputField'
 
+interface TaxState {
+  address: string
+  numEmployees: number
+  accountant: string
+}
+
 interface TaxInfoProps {
-  taxState: {
-    address: string
-    numEmployees: number
-    accountant: string
-  }
-  setTaxState: (state: any) => void
+  taxState: TaxState
+  setTaxState: (state: TaxState) => void
   isEditing: boolean
 }
 
