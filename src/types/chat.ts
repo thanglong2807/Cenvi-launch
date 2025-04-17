@@ -1,19 +1,22 @@
 export interface User {
   id: string;
   name: string;
-  avatar?: string;
+  avatar: string;
+  status: string;
+  online: boolean;
   lastMessage?: string;
   lastSeen?: string;
-  online?: boolean;
+  address?: string;
+  phone?: string;
   zaloLink?: string;
 }
 
 export interface Message {
   id: string;
   content: string;
-  sender: 'admin' | 'user';
+  sender: string;
   timestamp: string;
-  status: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
+  status: 'sending' | 'sent' | 'failed';
 }
 
 export interface MessageListProps {

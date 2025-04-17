@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { User, Message } from '@/types/chat';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Message } from '@/types/chat';
 import UserList from '@/components/chat/UserList';
 import ChatHeader from '@/components/chat/ChatHeader';
 import MessageList from '@/components/chat/MessageList';
@@ -9,22 +9,17 @@ import MessageInput from '@/components/chat/MessageInput';
 import UserDetails from '@/components/chat/UserDetails';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
 
 interface ZaloUser {
   id: string;
   avatar: string;
   name: string;
   status: string;
-}
-
-interface ZaloApiResponse {
-  data: {
-    followers: Array<{
-      user_id: string;
-      display_name: string;
-    }>;
-  };
+  online: boolean;
+  address?: string;
+  phone?: string;
+  lastMessage?: string;
+  lastSeen?: string;
 }
 
 export default function ChatPage() {
@@ -33,8 +28,10 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [isShowUserDetails, setIsShowUserDetails] = useState(false);
   const [zaloToken, setZaloToken] = useState('');
-  const [users, setUsers] = useState<User[]>([]);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<ZaloUser[]>([]);
+  const [selectedUser, setSelectedUser] = useState<ZaloUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const toggleUserDetails = () => {
     setIsShowUserDetails(prev => !prev);
@@ -87,50 +84,35 @@ export default function ChatPage() {
     }
   };
 
-  const getZaloUsers = async () => {
+  const getZaloUsers = useCallback(async () => {
     try {
-      const response = await axios.get<ZaloApiResponse>('https://openapi.zalo.me/v3.0/oa/user/getlist', {
-        params: {
-          data: JSON.stringify({
-            offset: 0,
-            count: 15,
-            last_interaction_period: "TODAY",
-            is_follower: "true"
-          })
-        },
+      setIsLoading(true);
+      setError(null);
+      const token = Cookies.get('token');
+      if (!token) {
+        setError('⚠️ Không có token. Không thể lấy dữ liệu.');
+        return;
+      }
+
+      const res = await axios.get<ZaloUser[]>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/zalo/`, {
         headers: {
-          'access_token': zaloToken
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
-      if (response.data.data?.followers) {
-        const zaloUsers: ZaloUser[] = response.data.data.followers.map(user => ({
-          id: user.user_id,
-          avatar: '',
-          name: user.display_name || 'Unknown User',
-          status: ''
-        }));
-        const users: User[] = zaloUsers.map(user => ({
-          id: user.id,
-          name: user.name,
-          lastMessage: '',
-          lastSeen: new Date().toLocaleTimeString(),
-          online: true,
-          zaloLink: `https://zalo.me/${user.id}`
-        }));
-        setUsers(users);
-        if (users.length > 0 && !selectedUser) {
-          setSelectedUser(users[0]);
-        }
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error fetching Zalo users:', error.message);
-      } else {
-        console.error('Error fetching Zalo users');
-      }
+
+      setUsers(res.data);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra khi tải dữ liệu';
+      setError(errorMessage);
+      console.error('❌ Error fetching Zalo users:', errorMessage);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    getZaloUsers();
+  }, [getZaloUsers]);
 
   useEffect(() => {
     const initializeZalo = async () => {
@@ -180,19 +162,39 @@ export default function ChatPage() {
     initializeZalo();
   }, []);
 
-  // Fetch users khi có token
-  useEffect(() => {
-    if (zaloToken) {
-      getZaloUsers();
-    }
-  }, [zaloToken]);
+  if (isLoading) {
+    return (
+      <div className="h-[calc(100vh-120px)] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-[calc(100vh-120px)] flex items-center justify-center">
+        <div className="text-center text-red-500">
+          <p>⚠️ {error}</p>
+          <button 
+            onClick={() => getZaloUsers()}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[calc(100vh-120px)] flex">
       <UserList
         users={users}
         selectedUser={selectedUser}
-        onSelectUser={(user: User | null) => setSelectedUser(user)}
+        onSelectUser={setSelectedUser}
       />
       <div className="flex-1 flex flex-col">
         {selectedUser && (
@@ -217,7 +219,6 @@ export default function ChatPage() {
       {isShowUserDetails && selectedUser && (
         <UserDetails 
           user={selectedUser}
-          onClose={toggleUserDetails}
         />
       )}
     </div>

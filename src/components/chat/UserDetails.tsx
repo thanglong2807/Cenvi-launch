@@ -1,19 +1,21 @@
 import React from 'react';
+import Image from 'next/image';
 import { User } from '@/types/chat';
 
 interface UserDetailsProps {
   user: User;
-  onClose: () => void;
 }
 
-export default function UserDetails({ user, onClose }: UserDetailsProps) {
+export default function UserDetails({ user }: UserDetailsProps) {
   return (
     <div className="w-80 border-l dark:border-gray-700 flex flex-col">
       <div className="p-4 flex flex-col items-center border-b dark:border-gray-700">
-        <img
-          src={user.avatar || '/images/user/z6404998099947_038f908df877578c2337104af90cbd8f.jpg'}
+        <Image
+          src={user.avatar || '/default-avatar.png'}
           alt={user.name}
-          className="w-16 h-16 rounded-full mb-3"
+          width={100}
+          height={100}
+          className="rounded-full mb-3"
         />
         <h2 className="font-medium text-lg">{user.name}</h2>
         
@@ -29,11 +31,11 @@ export default function UserDetails({ user, onClose }: UserDetailsProps) {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Địa chỉ:</span>
-            <span>Chưa công khai</span>
+            <span>{user.address}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Số điện thoại:</span>
-            <span>Chưa công khai</span>
+            <span>{user.phone}</span>
           </div>
         </div>
 
@@ -68,9 +70,11 @@ export default function UserDetails({ user, onClose }: UserDetailsProps) {
         <h3 className="font-medium mb-4">Hoạt động</h3>
         <div className="space-y-4">
           <div className="flex items-start gap-3">
-            <img
-              src={user.avatar || '/images/user/z6404998099947_038f908df877578c2337104af90cbd8f.jpg'}
+            <Image
+              src={user.avatar || '/default-avatar.png'}
               alt=""
+              width={32}
+              height={32}
               className="w-8 h-8 rounded-full"
             />
             <div>
@@ -82,9 +86,11 @@ export default function UserDetails({ user, onClose }: UserDetailsProps) {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <img
-              src={user.avatar || '/images/user/z6404998099947_038f908df877578c2337104af90cbd8f.jpg'}
+            <Image
+              src={user.avatar || '/default-avatar.png'}
               alt=""
+              width={32}
+              height={32}
               className="w-8 h-8 rounded-full"
             />
             <div>

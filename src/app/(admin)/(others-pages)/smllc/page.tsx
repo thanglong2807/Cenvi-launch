@@ -298,9 +298,11 @@ export default function Smllc() {
               <TableCell className="px-4 py-2">{company.owner}</TableCell>
               <TableCell className="px-4 py-2">
                 <Link
-                  href={`/smllc/businessprofiledetails?id=${company.id}`}
-                  className="text-blue-600 underline"
-                  target="_blank"
+                  href={{
+                    pathname: '/smllc/businessprofiledetails',
+                    query: { id: company.id }
+                  }}
+                  className="text-blue-600 hover:text-blue-800"
                 >
                   Xem hồ sơ
                 </Link>

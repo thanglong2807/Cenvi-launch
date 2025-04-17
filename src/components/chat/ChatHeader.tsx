@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { User } from '@/types/chat';
 
 interface ChatHeaderProps {
@@ -10,11 +11,16 @@ export default function ChatHeader({ user, onToggleUserDetails }: ChatHeaderProp
   return (
     <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
       <div className="flex items-center gap-3">
-        <img
-          src={user.avatar || '/images/user/z6404998099947_038f908df877578c2337104af90cbd8f.jpg'}
-          alt={user.name}
-          className="w-10 h-10 rounded-full"
-        />
+        <div className="relative">
+          <Image
+            src={user.avatar || '/default-avatar.png'}
+            alt={user.name}
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+          <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${user.online ? 'bg-green-500' : 'bg-gray-400'}`} />
+        </div>
         <div>
           <h2 className="font-medium">{user.name}</h2>
           <p className="text-sm text-gray-500">

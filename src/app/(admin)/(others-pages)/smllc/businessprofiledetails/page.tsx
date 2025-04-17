@@ -1,9 +1,8 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import Cookies from 'js-cookie'
-import { useSearchParams } from 'next/navigation'
 import LoadingProgressCircle from '@/components/ui/loading/Loading'
 import Button from '@/components/ui/button/Button'
 import CompanyInfo from './components/CompanyInfo'
@@ -14,6 +13,8 @@ import MemberInfo from './components/MemberInfo'
 import RepresentativeInfo from './components/RepresentativeInfo'
 import TaxInfo from './components/TaxInfo'
 import { CompanyState, CapitalState } from './types'
+import { useSearchParams } from 'next/navigation'
+import axios from 'axios'
 
 export interface BusinessProfile {
   id: string
@@ -211,7 +212,11 @@ const personToMember = (person: Person): Member => {
   }
 }
 
-export default function BusinessProfileDetails() {
+function BusinessProfileDetailsContent() {
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id')
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [profile, setProfile] = useState<BusinessProfile | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [typeBussiness, settypeBussiness] = useState('')
@@ -253,25 +258,29 @@ export default function BusinessProfileDetails() {
   const [membersState, setMembersState] = useState<Member[]>([])
   const [representativeState, setRepresentativeState] = useState<Person[]>([])
 
-  const searchParams = useSearchParams()
-  const id = searchParams.get('id')
-
   const fetchProfile = useCallback(async () => {
-    if (!id) return
+    if (!id) {
+      setError('Không tìm thấy ID công ty')
+      setIsLoading(false)
+      return
+    }
 
     try {
+      setIsLoading(true)
+      setError(null)
       const token = Cookies.get('token')
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/profile/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (!res.ok) {
-        throw new Error('Failed to fetch profile')
+      if (!token) {
+        setError('⚠️ Không có token. Không thể lấy dữ liệu.')
+        return
       }
 
-      const data: BusinessProfile = await res.json()
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/profile/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const data: BusinessProfile = res.data
       setProfile(data)
 
       // Set company data
@@ -318,8 +327,12 @@ export default function BusinessProfileDetails() {
       
       settypeBussiness(businessTypeMap[data.metadata.type] || 'Loại hình khác')
 
-    } catch (error) {
-      console.error('Error fetching profile:', error)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra khi tải dữ liệu'
+      setError(errorMessage)
+      console.error('❌ Error fetching profile:', errorMessage)
+    } finally {
+      setIsLoading(false)
     }
   }, [id])
 
@@ -433,7 +446,13 @@ export default function BusinessProfileDetails() {
     URL.revokeObjectURL(url);
   };
 
-  if (!profile) return <div className='w-full h-[70vh] flex justify-center items-center'><LoadingProgressCircle percentage={90} duration={1000}/></div>
+  if (isLoading) {
+    return <div className='w-full h-[70vh] flex justify-center items-center'><LoadingProgressCircle percentage={90} duration={1000}/></div>
+  }
+
+  if (error) {
+    return <div className="p-4 text-red-500">{error}</div>
+  }
 
   return (
     <div className="p-6 space-y-10 max-w-5xl mx-auto relative">
@@ -448,7 +467,14 @@ export default function BusinessProfileDetails() {
         setCapitalState={setCapitalState}
         isEditing={isEditing}
         typeBussiness={typeBussiness}
-        general={profile.metadata.general}
+        general={profile?.metadata?.general || {
+          provide: '',
+          date: {
+            day: 0,
+            month: 0,
+            year: 0
+          }
+        }}
       />
 
       <AddressInfo
@@ -500,5 +526,13 @@ export default function BusinessProfileDetails() {
         <Button variant="outline" onClick={handleDownloadProfile}>📥 Tải hồ sơ xuống</Button>
       </div>
     </div>
+  )
+}
+
+export default function BusinessProfileDetails() {
+  return (
+    <Suspense fallback={<div className='w-full h-[70vh] flex justify-center items-center'><LoadingProgressCircle percentage={90} duration={1000}/></div>}>
+      <BusinessProfileDetailsContent />
+    </Suspense>
   )
 }

@@ -5,7 +5,7 @@ import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useDispatch } from 'react-redux'
 import { setUser } from "@/redux/slices/authSlice";
@@ -14,19 +14,23 @@ import Alert from "../ui/alert/Alert";
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-export default function SignInForm() {
+interface SignInFormProps {
+  callbackUrl?: string;
+}
+
+export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/'
   const dispatch = useDispatch()
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false);
   
   const handleLogin = async () => {
     setError("");
+    setLoading(true);
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login/`,
@@ -39,13 +43,15 @@ export default function SignInForm() {
       const { token } = response.data;
       Cookies.set('token', token, { path: '/', expires: 7 });
       dispatch(setUser({ token }));
-      router.push(redirectTo);
+      router.push(callbackUrl);
     } catch (err: Error | unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
         setError('An error occurred during sign in');
       }
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -152,8 +158,8 @@ export default function SignInForm() {
                   </Link>
                 </div>
                 <div>
-                  <Button className="w-full" size="sm" onClick={handleLogin}>
-                    Đăng nhập
+                  <Button className="w-full" size="sm" onClick={handleLogin} disabled={loading}>
+                    {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                   </Button>
                 </div>
               </div>

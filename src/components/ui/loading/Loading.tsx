@@ -23,16 +23,14 @@ const LoadingProgressCircle: React.FC<LoadingProgressCircleProps> = ({
 
   useEffect(() => {
     if (animate) {
-      let start = 0
-      const startTime = performance.now()
-
-      const animateStep = (now: number) => {
-        const elapsed = now - startTime
-        const progress = Math.min(elapsed / duration, 1)
+      const start = Date.now()
+      const animateStep = () => {
+        const elapsed = Date.now() - start
+        const progress = Math.min((elapsed / duration) * percentage, percentage)
         const currentValue = Math.floor(progress * percentage)
         setProgressValue(currentValue)
 
-        if (progress < 1) {
+        if (progress < percentage) {
           requestAnimationFrame(animateStep)
         }
       }
