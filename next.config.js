@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
@@ -10,6 +11,10 @@ const nextConfig = {
   images: {
     domains: ['localhost', 'api.example.com'], // Add your image domains here
   },
+  experimental: {
+    instrumentationHook: true,
+    serverComponentsExternalPackages: ['@middleware.io/agent-apm-nextjs']
+},
   // Add this to handle the redirects
   async redirects() {
     return [
