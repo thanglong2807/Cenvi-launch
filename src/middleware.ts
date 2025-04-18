@@ -28,7 +28,9 @@ export function middleware(request: NextRequest) {
 
   // Nếu chưa login và không phải route public => chuyển hướng về trang đăng nhập
   if (!token && !isPublic) {
+    // Lưu URL hiện tại để redirect lại sau khi login
     const response = NextResponse.redirect(new URL('/signin', request.url))
+    response.cookies.set('redirectUrl', pathname, { httpOnly: true })
     // Xóa token cũ nếu có
     response.cookies.delete('token')
     return response
@@ -62,5 +64,6 @@ export const config = {
      * - public folder
      */
     '/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)',
+    '/', // Đảm bảo middleware chạy cho cả route gốc
   ],
 }
