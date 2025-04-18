@@ -10,7 +10,7 @@ export default function UserDropdown() {
 
   const handleLogout = () => {
     Cookies.remove("token");
-    router.push("/login");
+    router.push("/signin");
   };
 
   return (
@@ -20,7 +20,7 @@ export default function UserDropdown() {
         className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg"
       >
         <Image
-          src="/default-avatar.png"
+          src="/images/user/z6404998099947_038f908df877578c2337104af90cbd8f.jpg"
           alt="User"
           width={32}
           height={32}
