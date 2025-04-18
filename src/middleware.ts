@@ -1,7 +1,8 @@
 // middleware.ts
 import { NextRequest, NextResponse } from 'next/server'
 
-const PUBLIC_PATHS = ['/signin', '/signup', '/public']
+// Danh sách các route public không cần xác thực
+const PUBLIC_PATHS = ['/signin', '/signup', '/public', '/api/auth']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -17,6 +18,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Kiểm tra xem route có phải là public không
   const isPublic = PUBLIC_PATHS.some(path => pathname.startsWith(path))
 
   // Nếu đã login => không cho vào lại /signin
@@ -24,9 +26,25 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
-  // Nếu chưa login => chặn mọi đường dẫn private
+  // Nếu chưa login và không phải route public => chuyển hướng về trang đăng nhập
   if (!token && !isPublic) {
-    return NextResponse.redirect(new URL('/signin', request.url))
+    const response = NextResponse.redirect(new URL('/signin', request.url))
+    // Xóa token cũ nếu có
+    response.cookies.delete('token')
+    return response
+  }
+
+  // Nếu có token, thêm token vào header của request
+  if (token) {
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('Authorization', `Bearer ${token}`)
+    
+    const response = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
+    return response
   }
 
   return NextResponse.next()
@@ -37,12 +55,12 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
+     * - api/auth (authentication API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
+    '/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)',
   ],
 }
