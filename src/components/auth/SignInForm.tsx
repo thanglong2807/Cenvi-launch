@@ -10,12 +10,26 @@ import React, { useState } from "react";
 import { useDispatch } from 'react-redux'
 import { setUser } from "@/redux/slices/authSlice";
 import Alert from "../ui/alert/Alert";
-
+import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
-import axios from 'axios';
 
 interface SignInFormProps {
   callbackUrl?: string;
+}
+
+interface ApiError {
+  message: string;
+  detail?: string;
+}
+
+interface LoginResponse {
+  token: string;
+  user: {
+    id: number;
+    email: string;
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
@@ -31,8 +45,24 @@ export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
   const handleLogin = async () => {
     setError("");
     setLoading(true);
+    console.log(email);
+    console.log(password);
+    
+    
+    // Validate input
+    if (!email.trim()) {
+      setError('Vui lòng nhập email');
+      setLoading(false);
+      return;
+    }
+    if (!password) {
+      setError('Vui lòng nhập mật khẩu');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await axios.post(
+      const response = await axios.post<LoginResponse>(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login/`,
         {
           user_login: email,
@@ -40,20 +70,40 @@ export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
         }
       );
 
-      const { token } = response.data;
-      Cookies.set('token', token, { path: '/', expires: 7 });
-      dispatch(setUser({ token }));
-      router.push(callbackUrl);
-    } catch (err: Error | unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An error occurred during sign in');
+      console.log(response.data);
+      // Kiểm tra response có token và user không
+      if (!response.data.token) {
+        throw new Error('Thông tin đăng nhập không hợp lệ');
       }
+      
+      // Lưu token và thông tin user
+      const { token, user } = response.data;
+      Cookies.set('token', token, { path: '/', expires: isChecked ? 30 : 7 });
+      dispatch(setUser({ token, user }));
+      router.push(callbackUrl);
+    } catch (err) {
+      const error = err as AxiosError<ApiError>;
+      if (error.response?.status === 401) {
+        setError('Email hoặc mật khẩu không đúng');
+      } else if (error.response?.status === 400) {
+        setError(error.response.data.message || 'Thông tin đăng nhập không hợp lệ');
+      } else {
+        setError('Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại sau');
+      }
+      // Xóa token nếu có
+      Cookies.remove('token');
+      dispatch(setUser(null));
     } finally {
       setLoading(false);
     }
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  };
+
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
       <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
@@ -72,7 +122,7 @@ export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
               Đăng nhập
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-            Nhập email và mật khẩu để đăng nhập!
+              Nhập email và mật khẩu để đăng nhập!
             </p>
           </div>
           <div>
@@ -111,7 +161,7 @@ export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="p-2 text-gray-400 bg-white dark:bg-gray-900 sm:px-5 sm:py-2">
-                  Or
+                  Hoặc
                 </span>
               </div>
             </div>
@@ -119,17 +169,24 @@ export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
               <div className="space-y-6">
                 <div>
                   <Label>Email <span className="text-error-500">*</span></Label>
-                  <Input placeholder="info@gmail.com" defaultValue={email} onChange={e=>setEmail(e.target.value)} type="text" />
+                  <Input 
+                    placeholder="info@gmail.com" 
+                    defaultValue={email} 
+                    onChange={e=>setEmail(e.target.value)} 
+                    type="text" 
+                  />
                 </div>
                 <div>
                   <Label>
-                    Password <span className="text-error-500">*</span>
+                    Mật khẩu <span className="text-error-500">*</span>
                   </Label>
                   <div className="relative">
                     <Input
-                    defaultValue={password} onChange={e=>setPassword(e.target.value)} 
+                      defaultValue={password} 
+                      onChange={e=>setPassword(e.target.value)} 
+                      onKeyDown={handleKeyDown}
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder="Nhập mật khẩu của bạn"
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -147,7 +204,7 @@ export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
                   <div className="flex items-center gap-3">
                     <Checkbox checked={isChecked} onChange={setIsChecked} />
                     <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
-                    Giữ tôi đăng nhập
+                      Giữ tôi đăng nhập
                     </span>
                   </div>
                   <Link
@@ -157,25 +214,32 @@ export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
                     Quên mật khẩu
                   </Link>
                 </div>
+                {error && (
+                  <Alert
+                    variant="error"
+                    showLink={false}
+                    title="Lỗi"
+                    message={error}
+                  />
+                )}
                 <div>
-                  <Button className="w-full" size="sm" onClick={handleLogin} disabled={loading}>
+                  <Button 
+                    className="w-full" 
+                    size="sm" 
+                    onClick={handleLogin} 
+                    disabled={loading}
+                  >
                     {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                   </Button>
                 </div>
               </div>
             </>
-            {error && <Alert
-             variant="error"
-             showLink={error?true:false}
-             title="lỗi"
-             message={error}
-            />}
             <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                 Bạn không có tài khoản 
                 <Link
                   href="/signup"
-                  className=" pl-1 text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                  className="pl-1 text-brand-500 hover:text-brand-600 dark:text-brand-400"
                 >
                   Đăng ký
                 </Link>

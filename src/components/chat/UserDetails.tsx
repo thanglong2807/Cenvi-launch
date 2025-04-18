@@ -11,7 +11,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
     <div className="w-80 border-l dark:border-gray-700 flex flex-col">
       <div className="p-4 flex flex-col items-center border-b dark:border-gray-700">
         <Image
-          src={user.avatar || '/default-avatar.png'}
+          src={user.avatar || 'https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg'}
           alt={user.name}
           width={100}
           height={100}
@@ -71,7 +71,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
         <div className="space-y-4">
           <div className="flex items-start gap-3">
             <Image
-              src={user.avatar || '/default-avatar.png'}
+              src={user.avatar || 'https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg'}
               alt=""
               width={32}
               height={32}
@@ -87,7 +87,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
           </div>
           <div className="flex items-start gap-3">
             <Image
-              src={user.avatar || '/default-avatar.png'}
+              src={user.avatar || 'https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg'}
               alt=""
               width={32}
               height={32}

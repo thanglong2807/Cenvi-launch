@@ -18,43 +18,43 @@ export default function AvatarPage() {
         <ComponentCard title="Default Avatar">
           {/* Default Avatar (No Status) */}
           <div className="flex flex-col items-center justify-center gap-5 sm:flex-row">
-            <Avatar src="/images/user/user-01.jpg" size="xsmall" />
-            <Avatar src="/images/user/user-01.jpg" size="small" />
-            <Avatar src="/images/user/user-01.jpg" size="medium" />
-            <Avatar src="/images/user/user-01.jpg" size="large" />
-            <Avatar src="/images/user/user-01.jpg" size="xlarge" />
-            <Avatar src="/images/user/user-01.jpg" size="xxlarge" />
+            <Avatar src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg" size="xsmall" />
+            <Avatar src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg" size="small" />
+            <Avatar src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg" size="medium" />
+            <Avatar src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg" size="large" />
+            <Avatar src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg" size="xlarge" />
+            <Avatar src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg" size="xxlarge" />
           </div>
         </ComponentCard>
         <ComponentCard title="Avatar with online indicator">
           <div className="flex flex-col items-center justify-center gap-5 sm:flex-row">
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="xsmall"
               status="online"
             />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="small"
               status="online"
             />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="medium"
               status="online"
             />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="large"
               status="online"
             />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="xlarge"
               status="online"
             />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="xxlarge"
               status="online"
             />
@@ -63,32 +63,32 @@ export default function AvatarPage() {
         <ComponentCard title="Avatar with Offline indicator">
           <div className="flex flex-col items-center justify-center gap-5 sm:flex-row">
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="xsmall"
               status="offline"
             />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="small"
               status="offline"
             />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="medium"
               status="offline"
             />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="large"
               status="offline"
             />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="xlarge"
               status="offline"
             />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="xxlarge"
               status="offline"
             />
@@ -97,24 +97,24 @@ export default function AvatarPage() {
         <ComponentCard title="Avatar with busy indicator">
           <div className="flex flex-col items-center justify-center gap-5 sm:flex-row">
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="xsmall"
               status="busy"
             />
-            <Avatar src="/images/user/user-01.jpg" size="small" status="busy" />
+            <Avatar src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg" size="small" status="busy" />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="medium"
               status="busy"
             />
-            <Avatar src="/images/user/user-01.jpg" size="large" status="busy" />
+            <Avatar src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg" size="large" status="busy" />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="xlarge"
               status="busy"
             />
             <Avatar
-              src="/images/user/user-01.jpg"
+              src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
               size="xxlarge"
               status="busy"
             />

@@ -26,7 +26,7 @@ export default function UserList({ users, selectedUser, onSelectUser }: UserList
             <div className="flex items-center gap-3">
               <div className="relative">
                 <Image
-                  src={user.avatar || '/default-avatar.png'}
+                  src={user.avatar || 'https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg'}
                   alt={user.name}
                   width={40}
                   height={40}

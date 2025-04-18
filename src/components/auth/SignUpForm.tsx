@@ -4,11 +4,111 @@ import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import Alert from "../ui/alert/Alert";
+import axios, { AxiosError } from 'axios';
+import Cookies from 'js-cookie';
+import { useDispatch } from 'react-redux';
+import { setUser } from "@/redux/slices/authSlice";
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+interface ApiError {
+  message: string;
+}
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [formData, setFormData] = useState<FormData>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: ''
+  });
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  const validateForm = () => {
+    if (!formData.firstName.trim()) {
+      setError('Vui lòng nhập tên');
+      return false;
+    }
+    if (!formData.lastName.trim()) {
+      setError('Vui lòng nhập họ');
+      return false;
+    }
+    if (!formData.email.trim()) {
+      setError('Vui lòng nhập email');
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError('Email không hợp lệ');
+      return false;
+    }
+    if (!formData.password) {
+      setError('Vui lòng nhập mật khẩu');
+      return false;
+    }
+    if (formData.password.length < 6) {
+      setError('Mật khẩu phải có ít nhất 6 ký tự');
+      return false;
+    }
+    if (!isChecked) {
+      setError('Vui lòng đồng ý với điều khoản và điều kiện');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/register/`,
+        {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          password: formData.password
+        }
+      );
+
+      const { token } = response.data;
+      Cookies.set('token', token, { path: '/', expires: 7 });
+      dispatch(setUser({ token }));
+      router.push('/');
+    } catch (err) {
+      const error = err as AxiosError<ApiError>;
+      setError(error.response?.data?.message || 'Đã xảy ra lỗi khi đăng ký');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full overflow-y-auto no-scrollbar">
       <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
@@ -17,17 +117,17 @@ export default function SignUpForm() {
           className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
         >
           <ChevronLeftIcon />
-          Back to dashboard
+          Quay lại bảng điều khiển
         </Link>
       </div>
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Sign Up
+              Đăng ký
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your email and password to sign up!
+              Nhập thông tin để tạo tài khoản mới!
             </p>
           </div>
           <div>
@@ -57,7 +157,7 @@ export default function SignUpForm() {
                     fill="#EB4335"
                   />
                 </svg>
-                Sign up with Google
+                Đăng ký với Google
               </button>
               <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
                 <svg
@@ -79,58 +179,60 @@ export default function SignUpForm() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="p-2 text-gray-400 bg-white dark:bg-gray-900 sm:px-5 sm:py-2">
-                  Or
+                  Hoặc
                 </span>
               </div>
             </div>
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="space-y-5">
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  {/* <!-- First Name --> */}
                   <div className="sm:col-span-1">
                     <Label>
-                      First Name<span className="text-error-500">*</span>
+                      Tên<span className="text-error-500">*</span>
                     </Label>
                     <Input
                       type="text"
-                      id="fname"
-                      name="fname"
-                      placeholder="Enter your first name"
+                      name="firstName"
+                      defaultValue={formData.firstName}
+                      onChange={handleInputChange}
+                      placeholder="Nhập tên của bạn"
                     />
                   </div>
-                  {/* <!-- Last Name --> */}
                   <div className="sm:col-span-1">
                     <Label>
-                      Last Name<span className="text-error-500">*</span>
+                      Họ<span className="text-error-500">*</span>
                     </Label>
                     <Input
                       type="text"
-                      id="lname"
-                      name="lname"
-                      placeholder="Enter your last name"
+                      name="lastName"
+                      defaultValue={formData.lastName}
+                      onChange={handleInputChange}
+                      placeholder="Nhập họ của bạn"
                     />
                   </div>
                 </div>
-                {/* <!-- Email --> */}
                 <div>
                   <Label>
                     Email<span className="text-error-500">*</span>
                   </Label>
                   <Input
                     type="email"
-                    id="email"
                     name="email"
-                    placeholder="Enter your email"
+                    defaultValue={formData.email}
+                    onChange={handleInputChange}
+                    placeholder="Nhập email của bạn"
                   />
                 </div>
-                {/* <!-- Password --> */}
                 <div>
                   <Label>
-                    Password<span className="text-error-500">*</span>
+                    Mật khẩu<span className="text-error-500">*</span>
                   </Label>
                   <div className="relative">
                     <Input
-                      placeholder="Enter your password"
+                      name="password"
+                      defaultValue={formData.password}
+                      onChange={handleInputChange}
+                      placeholder="Nhập mật khẩu"
                       type={showPassword ? "text" : "password"}
                     />
                     <span
@@ -145,7 +247,6 @@ export default function SignUpForm() {
                     </span>
                   </div>
                 </div>
-                {/* <!-- Checkbox --> */}
                 <div className="flex items-center gap-3">
                   <Checkbox
                     className="w-5 h-5"
@@ -153,20 +254,31 @@ export default function SignUpForm() {
                     onChange={setIsChecked}
                   />
                   <p className="inline-block font-normal text-gray-500 dark:text-gray-400">
-                    By creating an account means you agree to the{" "}
+                    Bằng cách tạo tài khoản, bạn đồng ý với{" "}
                     <span className="text-gray-800 dark:text-white/90">
-                      Terms and Conditions,
+                      Điều khoản và Điều kiện,
                     </span>{" "}
-                    and our{" "}
+                    và{" "}
                     <span className="text-gray-800 dark:text-white">
-                      Privacy Policy
+                      Chính sách Bảo mật
                     </span>
                   </p>
                 </div>
-                {/* <!-- Button --> */}
+                {error && (
+                  <Alert
+                    variant="error"
+                    showLink={false}
+                    title="Lỗi"
+                    message={error}
+                  />
+                )}
                 <div>
-                  <button className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
-                    Sign Up
+                  <button 
+                    type="submit"
+                    disabled={loading}
+                    className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 disabled:opacity-50"
+                  >
+                    {loading ? 'Đang đăng ký...' : 'Đăng ký'}
                   </button>
                 </div>
               </div>
@@ -174,12 +286,12 @@ export default function SignUpForm() {
 
             <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                Already have an account?
+                Đã có tài khoản?
                 <Link
                   href="/signin"
-                  className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                  className="pl-1 text-brand-500 hover:text-brand-600 dark:text-brand-400"
                 >
-                  Sign In
+                  Đăng nhập
                 </Link>
               </p>
             </div>

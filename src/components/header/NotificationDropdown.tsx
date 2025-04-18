@@ -89,7 +89,7 @@ export default function NotificationDropdown() {
                 <Image
                   width={40}
                   height={40}
-                  src="/images/user/user-02.jpg"
+                  src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
                   alt="User"
                   className="w-full overflow-hidden rounded-full"
                 />
@@ -125,7 +125,7 @@ export default function NotificationDropdown() {
                 <Image
                   width={40}
                   height={40}
-                  src="/images/user/user-03.jpg"
+                  src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
                   alt="User"
                   className="w-full overflow-hidden rounded-full"
                 />
@@ -162,7 +162,7 @@ export default function NotificationDropdown() {
                 <Image
                   width={40}
                   height={40}
-                  src="/images/user/user-04.jpg"
+                  src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
                   alt="User"
                   className="w-full overflow-hidden rounded-full"
                 />
@@ -199,7 +199,7 @@ export default function NotificationDropdown() {
                 <Image
                   width={40}
                   height={40}
-                  src="/images/user/user-05.jpg"
+                  src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
                   alt="User"
                   className="w-full overflow-hidden rounded-full"
                 />
@@ -235,7 +235,7 @@ export default function NotificationDropdown() {
                 <Image
                   width={40}
                   height={40}
-                  src="/images/user/user-02.jpg"
+                  src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
                   alt="User"
                   className="w-full overflow-hidden rounded-full"
                 />
@@ -271,7 +271,7 @@ export default function NotificationDropdown() {
                 <Image
                   width={40}
                   height={40}
-                  src="/images/user/user-03.jpg"
+                  src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
                   alt="User"
                   className="w-full overflow-hidden rounded-full"
                 />
@@ -307,7 +307,7 @@ export default function NotificationDropdown() {
                 <Image
                   width={40}
                   height={40}
-                  src="/images/user/user-04.jpg"
+                  src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
                   alt="User"
                   className="w-full overflow-hidden rounded-full"
                 />
@@ -344,7 +344,7 @@ export default function NotificationDropdown() {
                 <Image
                   width={40}
                   height={40}
-                  src="/images/user/user-05.jpg"
+                  src="https://i.ibb.co/CsWdrXtc/z6404998099947-038f908df877578c2337104af90cbd8f.jpg"
                   alt="User"
                   className="overflow-hidden rounded-full"
                 />
