@@ -2,18 +2,23 @@
     "version": 2,
     "builds": [
       {
-        "src": "src/index.js",
-        "use": "@vercel/node"
+        "src": "package.json",
+        "use": "@vercel/next"
       }
     ],
     "routes": [
       {
         "src": "/api/(.*)",
-        "dest": "src/index.js"
+        "dest": "/api/$1"
       },
       {
         "src": "/(.*)",
-        "dest": "/"
+        "dest": "/$1"
       }
-    ]
+    ],
+    "env": {
+      "NEXT_PUBLIC_API_BASE_URL": "@next_public_api_base_url",
+      "NODE_ENV": "production"
+    },
+    "framework": "nextjs"
   }
