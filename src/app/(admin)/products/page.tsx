@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/button';
 import Input from '@/components/form/input';
-import { PlusIcon } from '@heroicons/react/24/outline';
 
 interface Category {
   id: number;
@@ -44,14 +43,12 @@ export default function ProductsPage() {
             className="flex items-center gap-2"
             onClick={() => router.push('/products/categories/new')}
           >
-            <PlusIcon className="h-5 w-5" />
             Thêm danh mục
           </Button>
           <Button
             className="flex items-center gap-2"
             onClick={() => router.push('/products/new')}
           >
-            <PlusIcon className="h-5 w-5" />
             Thêm sản phẩm
           </Button>
         </div>

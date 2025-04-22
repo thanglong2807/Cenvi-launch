@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/button';
 import Input from '@/components/form/input';
-import { PlusIcon } from '@heroicons/react/24/outline';
 
 interface Employee {
   id: number;
@@ -72,7 +71,6 @@ export default function EmployeesPage() {
             className="flex items-center gap-2"
             onClick={() => router.push('/employees/new')}
           >
-            <PlusIcon className="h-5 w-5" />
             Thêm NV
           </Button>
         </div>

@@ -4,7 +4,6 @@ import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/button";
 import Input from "@/components/form/input";
-import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 interface Order {
   id: string;
@@ -211,11 +210,7 @@ export default function OrdersPage() {
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return null;
-    return sortDirection === "asc" ? (
-      <ChevronUpIcon className="w-4 h-4 inline ml-1" />
-    ) : (
-      <ChevronDownIcon className="w-4 h-4 inline ml-1" />
-    );
+    return sortDirection === "asc" 
   };
 
   return (
@@ -341,7 +336,6 @@ export default function OrdersPage() {
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
               >
-                <ChevronLeftIcon className="w-4 h-4" />
               </Button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                 <Button
@@ -357,7 +351,6 @@ export default function OrdersPage() {
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                <ChevronRightIcon className="w-4 h-4" />
               </Button>
             </div>
           </div>

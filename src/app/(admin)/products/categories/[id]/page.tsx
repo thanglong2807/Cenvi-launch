@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/button';
-import { PlusIcon } from '@heroicons/react/24/outline';
 
 interface Product {
   id: number;
@@ -63,7 +62,6 @@ export default function CategoryDetailPage() {
             className="flex items-center gap-2"
             onClick={() => router.push('/products/new')}
           >
-            <PlusIcon className="h-5 w-5" />
             Thêm sản phẩm
           </Button>
         </div>
