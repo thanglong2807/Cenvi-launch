@@ -1,25 +1,27 @@
 {
     "version": 2,
+    "framework": "nextjs",
+    "buildCommand": "next build",
+    "devCommand": "next dev",
     "builds": [
       {
         "src": "package.json",
         "use": "@vercel/next"
       }
     ],
-    "routes": [
+    "rewrites": [
       {
-        "src": "/api/(.*)",
-        "dest": "/api/$1"
+        "source": "/api/:path*",
+        "destination": "/api/:path*"
       },
       {
-        "src": "/(.*)",
-        "dest": "/$1"
+        "source": "/(.*)",
+        "destination": "/"
       }
     ],
     "env": {
       "NODE_ENV": "production"
     },
-    "framework": "nextjs",
     "regions": ["sin1"],
     "headers": [
       {
