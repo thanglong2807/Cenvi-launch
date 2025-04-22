@@ -29,22 +29,22 @@ const navItems: NavItem[] = [
   {
     icon: <CalenderIcon />,
     name: "Khách hàng",
-    path: "#",
+    path: "/customers",
   },
   {
     icon: <CalenderIcon />,
     name: "Nhân viên",
-    path: "#",
+    path: "/employees",
   },
   {
     icon: <CalenderIcon />,
     name: "Đơn hàng",
-    path: "#",
+    path: "/orders",
   },
   {
     icon: <CalenderIcon />,
     name: "Sản phẩm/danh mục",
-    path: "#",
+    path: "/products",
   },
   {
     icon: <CalenderIcon />,
