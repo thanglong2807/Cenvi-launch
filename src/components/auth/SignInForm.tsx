@@ -10,26 +10,43 @@ import React, { useState } from "react";
 import { useDispatch } from 'react-redux'
 import { setUser } from "@/redux/slices/authSlice";
 import Alert from "../ui/alert/Alert";
-import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
+
+// Dữ liệu mẫu cho việc đăng nhập
+const MOCK_USERS = [
+  {
+    email: 'admin',
+    password: 'admin123',
+    role: 'admin',
+    first_name: 'Admin',
+    last_name: 'User',
+    id: 1
+  },
+  {
+    email: 'user@example.com',
+    password: 'user123',
+    role: 'user',
+    first_name: 'Normal',
+    last_name: 'User',
+    id: 2
+  }
+];
+
+// Hàm tạo token fake
+const generateFakeToken = (user: typeof MOCK_USERS[0]) => {
+  const payload = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    first_name: user.first_name,
+    last_name: user.last_name,
+    exp: Date.now() + 24 * 60 * 60 * 1000 // Token hết hạn sau 24h
+  };
+  return btoa(JSON.stringify(payload));
+};
 
 interface SignInFormProps {
   callbackUrl?: string;
-}
-
-interface ApiError {
-  message: string;
-  detail?: string;
-}
-
-interface LoginResponse {
-  token: string;
-  user: {
-    id: number;
-    email: string;
-    first_name: string;
-    last_name: string;
-  };
 }
 
 export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
@@ -45,9 +62,6 @@ export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
   const handleLogin = async () => {
     setError("");
     setLoading(true);
-    console.log(email);
-    console.log(password);
-    
     
     // Validate input
     if (!email.trim()) {
@@ -62,37 +76,45 @@ export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
     }
 
     try {
-      const response = await axios.post<LoginResponse>(
-        // `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login/`,
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/`,
+      // Giả lập delay của API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-        
-        {
-          user_login: email,
-          password: password,
-        }
+      // Kiểm tra thông tin đăng nhập với dữ liệu mẫu
+      const user = MOCK_USERS.find(u => 
+        u.email === email && u.password === password
       );
 
-      console.log(response.data);
-      // Kiểm tra response có token và user không
-      if (!response.data.token) {
-        throw new Error('Thông tin đăng nhập không hợp lệ');
+      if (!user) {
+        throw new Error('Email hoặc mật khẩu không đúng');
       }
+
+      // Tạo token fake
+      const token = generateFakeToken(user);
       
       // Lưu token và thông tin user
-      const { token, user } = response.data;
-      Cookies.set('token', token, { path: '/', expires: isChecked ? 30 : 7 });
-      dispatch(setUser({ token, user }));
-      router.push(callbackUrl);
+      Cookies.set('token', token, { 
+        path: '/', 
+        expires: isChecked ? 30 : 7,
+        secure: true,
+        sameSite: 'strict'
+      });
+
+      // Lưu thông tin user vào Redux store
+      dispatch(setUser({ 
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          first_name: user.first_name,
+          last_name: user.last_name
+        }
+      }));
+
+      // Chuyển hướng dựa vào role
+      router.push(user.role === 'admin' ? '/' : callbackUrl);
+
     } catch (err) {
-      const error = err as AxiosError<ApiError>;
-      if (error.response?.status === 401) {
-        setError('Email hoặc mật khẩu không đúng');
-      } else if (error.response?.status === 400) {
-        setError(error.response.data.message || 'Thông tin đăng nhập không hợp lệ');
-      } else {
-        setError('Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại sau');
-      }
+      setError(err instanceof Error ? err.message : 'Đã có lỗi xảy ra');
       // Xóa token nếu có
       Cookies.remove('token');
       dispatch(setUser(null));
