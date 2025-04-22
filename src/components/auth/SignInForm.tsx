@@ -63,7 +63,10 @@ export default function SignInForm({ callbackUrl = '/' }: SignInFormProps) {
 
     try {
       const response = await axios.post<LoginResponse>(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login/`,
+        // `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/`,
+
+        
         {
           user_login: email,
           password: password,
