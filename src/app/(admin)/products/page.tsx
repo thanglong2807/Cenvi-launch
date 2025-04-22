@@ -24,7 +24,7 @@ const initialCategories: Category[] = [
 
 export default function ProductsPage() {
   const router = useRouter();
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [categories] = useState<Category[]>(initialCategories);
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredCategories = categories.filter(category =>

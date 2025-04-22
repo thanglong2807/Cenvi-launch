@@ -27,7 +27,7 @@ export default function OrdersPage() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const orders: Order[] = [
+  const orders = useMemo<Order[]>(() => [
     {
       id: "1",
       orderNumber: "DKKD-01",
@@ -148,7 +148,7 @@ export default function OrdersPage() {
       paymentType: "50% (công nợ)",
       status: "Thanh toán 1 phần"
     }
-  ];
+  ], []);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
