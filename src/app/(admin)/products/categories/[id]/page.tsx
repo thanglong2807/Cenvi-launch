@@ -1,117 +1,288 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Button from '@/components/ui/button';
+import React, { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import Input from "@/components/form/input";
+import { useDispatch } from "react-redux";
+import Link from "next/link";
+import AppHeader from "@/layout/AppHeader";
+import HeaderItem from "@/layout/HeaderItem";
+import Image from "next/image";
+import Container from "@/components/Container/Container";
+import Select from "@/components/form/Select";
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  details?: string[];
+interface FormData {
+  productCode: string;
+  productName: string;
+  specification: string;
+  unit: string;
+  options: string;
+  color: string;
+  supplier: string;
+  price: string;
+  image?: File | null;
+  description: string;
 }
 
-// Dữ liệu mẫu cho danh mục "Thành lập doanh nghiệp"
-const sampleProducts: Product[] = [
-  {
-    id: 1,
-    name: 'Gói nền tảng',
-    price: 399000,
-    details: [
-      'Tư vấn thủ tục',
-      'Soạn hồ sơ cơ bản',
-      'Đăng ký MST'
-    ]
-  },
-  {
-    id: 2,
-    name: 'Gói cơ bản',
-    price: 1299000,
-    details: [
-      'Tất cả dịch vụ của gói nền tảng',
-      'Thiết kế logo cơ bản',
-      'Đăng ký con dấu'
-    ]
-  },
-  {
-    id: 3,
-    name: 'Gói nâng cao',
-    price: 3499000,
-    details: [
-      'Tất cả dịch vụ của gói cơ bản',
-      'Thiết kế logo cao cấp',
-      'Đăng ký BHXH',
-      'Tư vấn thuế 1 năm'
-    ]
-  }
-];
+interface FormErrors {
+  productCode?: string;
+  productName?: string;
+  specification?: string;
+  unit?: string;
+  options?: string;
+  color?: string;
+  supplier?: string;
+  price?: string;
+  image?: string;
+  description?: string;
+}
 
-export default function CategoryDetailPage() {
+export default function CatalogDetailPage() {
   const router = useRouter();
-  const [products] = useState<Product[]>(sampleProducts);
-  const [showDetails, setShowDetails] = useState<number | null>(null);
+  const params = useParams();
+  const dispatch = useDispatch();
+
+  const [formData, setFormData] = useState<FormData>({
+    productCode: "",
+    productName: "",
+    specification: "",
+    unit: "",
+    options: "",
+    color: "",
+    supplier: "",
+    price: "",
+    image: null,
+    description: ""
+  });
+
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  // Sample options for dropdowns
+  const unitOptions = [
+    { label: "Cái", value: "cai" },
+    { label: "Bộ", value: "bo" },
+    { label: "Chiếc", value: "chiec" },
+    { label: "Kg", value: "kg" }
+  ];
+
+  const supplierOptions = [
+    { label: "Nhà cung cấp A", value: "supplier_a" },
+    { label: "Nhà cung cấp B", value: "supplier_b" },
+    { label: "Nhà cung cấp C", value: "supplier_c" }
+  ];
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Clear error when user types
+    if (errors[name as keyof FormErrors]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: undefined
+      }));
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData(prev => ({
+        ...prev,
+        image: e.target.files![0]
+      }));
+    }
+  };
+
+  const handleSubmit = () => {
+    // Validation logic would go here
+    // For now, just log the form data
+    console.log(formData);
+  };
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-      <div className="border-b border-gray-200 dark:border-gray-800 px-6 py-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
-            Danh mục: Thành lập doanh nghiệp
-          </h3>
-          <Button
-            className="flex items-center gap-2"
-            onClick={() => router.push('/products/new')}
-          >
-            Thêm sản phẩm
-          </Button>
-        </div>
-      </div>
+    <div className="space-y-6 bg-[#fff]">
+      <AppHeader>
+        <HeaderItem
+          title="Sản phẩm / Danh sách sản phẩm / Thông tin sản phẩm"
+          right={
+            <div className="flex gap-2">
+              <Button
+                className="text-center justify-center bg-transparent border border-amber-500 text-amber-500 text-sm font-normal font-['Inter'] leading-snug"
+                onClick={() => router.back()}
+              >
+                Hủy
+              </Button>
+              <Button
+                className="text-center justify-center text-white text-sm font-normal font-['Inter'] leading-snug"
+                onClick={handleSubmit}
+              >
+                Lưu
+              </Button>
+            </div>
+          }
+          left={
+            <Link href="/products/productlist">
+              <Image src="/images/icons/back.svg" alt="arrow-left" width={24} height={24} />
+            </Link>
+          }
+        />
+      </AppHeader>
 
-      <div className="p-6">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-800">
-                <th className="px-4 py-2 text-left">STT</th>
-                <th className="px-4 py-2 text-left">Tên sản phẩm</th>
-                <th className="px-4 py-2 text-left">Giá</th>
-                <th className="px-4 py-2 text-left">Sản phẩm kèm theo</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product, index) => (
-                <tr key={product.id} className="border-b border-gray-200 dark:border-gray-800">
-                  <td className="px-4 py-2">{index + 1}</td>
-                  <td className="px-4 py-2">{product.name}</td>
-                  <td className="px-4 py-2">
-                    {new Intl.NumberFormat('vi-VN', {
-                      style: 'decimal',
-                      minimumFractionDigits: 0
-                    }).format(product.price)}
-                  </td>
-                  <td className="px-4 py-2">
-                    <Button
-                      variant="secondary"
-                      onClick={() => setShowDetails(showDetails === product.id ? null : product.id)}
-                    >
-                      Chi tiết
-                    </Button>
-                    {showDetails === product.id && (
-                      <div className="absolute mt-2 p-4 bg-white border rounded-lg shadow-lg z-10">
-                        <ul className="list-disc list-inside">
-                          {product.details?.map((detail, i) => (
-                            <li key={i}>{detail}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <Container>
+        <div className="grid grid-cols-2 gap-x-35 border border-gray-300 rounded-2xl px-14 py-8 gap-y-3">
+          <Input
+            label="Mã sản phẩm:"
+            flex="flex items-center"
+            classNameLabel="w-50 flex item-center"
+            className="border border-gray-300"
+            name="productCode"
+            value={formData.productCode}
+            onChange={handleChange}
+            error={errors.productCode}
+            required
+          />
+          <Input
+            label="Tên sản phẩm:"
+            flex="flex items-center"
+            classNameLabel="w-50 flex item-center"
+            className="border border-gray-300"
+            name="productName"
+            value={formData.productName}
+            onChange={handleChange}
+            error={errors.productName}
+            required
+          />
+          <div className="flex items-center">
+            <label className="w-[150px] flex item-center text-sm font-medium text-gray-700">Thông số:</label>
+            <div className="flex-1 flex items-center gap-2">
+              <Input
+                className="border border-gray-300 w-full"
+                name="specification"
+                value={formData.specification}
+                onChange={handleChange}
+                error={errors.specification}
+                required
+                flex="flex-1"
+              />
+              <div className="flex-1">
+                <Select
+                  className="w-full"
+                  options={unitOptions}
+                  placeholder="Chọn đơn vị"
+                  onChange={(value) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      unit: value
+                    }));
+                    if (errors.unit) {
+                      setErrors(prev => ({
+                        ...prev,
+                        unit: undefined
+                      }));
+                    }
+                  }}
+                  defaultValue={formData.unit}
+                />
+              </div>
+            </div>
+          </div>
+
+          <Input
+            label="Tùy chọn:"
+            flex="flex items-center"
+            classNameLabel="w-50 flex item-center"
+            className="border border-gray-300"
+            name="options"
+            value={formData.options}
+            onChange={handleChange}
+            error={errors.options}
+          />
+          <Input
+            label="Màu sắc:"
+            flex="flex items-center"
+            classNameLabel="w-50 flex item-center"
+            className="border border-gray-300"
+            name="color"
+            value={formData.color}
+            onChange={handleChange}
+            error={errors.color}
+          />
+          <div className="flex items-center">
+            <label className="w-[150px] flex item-center text-sm font-medium text-gray-700">Nhà cung cấp:</label>
+            <div className="flex-1">
+              <Select
+                className="w-full"
+                options={supplierOptions}
+                placeholder="Chọn..."
+                onChange={(value) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    supplier: value
+                  }));
+                  if (errors.supplier) {
+                    setErrors(prev => ({
+                      ...prev,
+                      supplier: undefined
+                    }));
+                  }
+                }}
+                defaultValue={formData.supplier}
+              />
+            </div>
+          </div>
+          <Input
+            label="Giá bán:"
+            flex="flex items-center"
+            classNameLabel="w-50 flex item-center"
+            className="border border-gray-300"
+            name="price"
+            value={formData.price}
+            onChange={handleChange}
+            error={errors.price}
+            required
+          />
+          <div></div>
+          <div className="flex order-9 items-start col-span-1">
+            <label className="w-[150px] flex item-center text-sm font-medium text-gray-700 pt-2">Mô tả:</label>
+            <textarea
+              className="flex-1 border border-gray-300 rounded p-2 min-h-[120px]"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Nhập..."
+            />
+          </div>
+          <div className="flex items-center col-span-1 ">
+            <label className="w-[150px] flex item-center text-sm font-medium text-gray-700">Ảnh:</label>
+            <div className="flex-1">
+              <label htmlFor="product-image" className="cursor-pointer">
+                <div className="w-full h-[120px] bg-amber-50   border-gray-300 rounded-2xl border-0 flex flex-col items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center mb-2">
+                    <Image src="/images/icons/upload-cloud.svg" alt="upload" width={16} height={16} />
+                  </div>
+                  <div className="text-center text-amber-500">
+                    Nhấn để tải lên ảnh sản phẩm
+                    <p className="text-xs text-gray-500">SVG, PNG, JPG hoặc GIF (tối đa 800x400px)</p>
+                  </div>
+                </div>
+              </label>
+              <input
+                id="product-image"
+                type="file"
+                className="hidden"
+                accept="image/svg+xml,image/png,image/jpeg,image/gif"
+                onChange={handleImageUpload}
+              />
+            </div>
+          </div>
+
         </div>
-      </div>
+      </Container>
+
     </div>
   );
 } 

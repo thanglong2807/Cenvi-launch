@@ -330,7 +330,7 @@ export default function RecentOrders() {
       
       {/* Pagination */}
       <div className="mt-4 flex justify-between items-center">
-        <div className="text-sm text-gray-500">
+        <div className="text-sm  text-gray-500">
           Hiển thị {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, filteredData.length)} của {filteredData.length} mục
         </div>
         <Pagination

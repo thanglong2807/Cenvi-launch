@@ -43,24 +43,25 @@ const Calendar: React.FC = () => {
     setEvents([
       {
         id: "1",
-        title: "Event Conf.",
+        title: "Ca 1: Bàn giao công ty XXX",
         start: new Date().toISOString().split("T")[0],
         extendedProps: { calendar: "Danger" },
       },
       {
         id: "2",
-        title: "Meeting",
+        title: "Ca 2: Bàn giao công ty ...",
         start: new Date(Date.now() + 86400000).toISOString().split("T")[0],
         extendedProps: { calendar: "Success" },
       },
       {
         id: "3",
-        title: "Workshop",
+        title: "Ca 3: Bàn giao công ty zzz",
         start: new Date(Date.now() + 172800000).toISOString().split("T")[0],
         end: new Date(Date.now() + 259200000).toISOString().split("T")[0],
         extendedProps: { calendar: "Primary" },
       },
     ]);
+    getData()
   }, []);
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
@@ -120,6 +121,10 @@ const Calendar: React.FC = () => {
     setSelectedEvent(null);
   };
 
+  const getData = ()=> {
+
+  }
+
   return (
     <div className="rounded-2xl border  border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
       <div className="custom-calendar">
@@ -139,7 +144,7 @@ const Calendar: React.FC = () => {
           eventContent={renderEventContent}
           customButtons={{
             addEventButton: {
-              text: "Add Event +",
+              text: "Thêm lịch ",
               click: openModal,
             },
           }}
@@ -176,7 +181,7 @@ const Calendar: React.FC = () => {
             </div>
             <div className="mt-6">
               <label className="block mb-4 text-sm font-medium text-gray-700 dark:text-gray-400">
-                Event Color
+                Trạng thái
               </label>
               <div className="flex flex-wrap items-center gap-4 sm:gap-5">
                 {Object.entries(calendarsEvents).map(([key, value]) => (
@@ -216,7 +221,7 @@ const Calendar: React.FC = () => {
 
             <div className="mt-6">
               <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                Enter Start Date
+                Nhập ngày bắt đầu
               </label>
               <div className="relative">
                 <input
@@ -231,7 +236,7 @@ const Calendar: React.FC = () => {
 
             <div className="mt-6">
               <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                Enter End Date
+                Nhập ngày kết thúc
               </label>
               <div className="relative">
                 <input
@@ -250,7 +255,7 @@ const Calendar: React.FC = () => {
               type="button"
               className="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto"
             >
-              Close
+              Đóng
             </button>
             <button
               onClick={handleAddOrUpdateEvent}

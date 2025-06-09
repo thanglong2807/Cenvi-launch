@@ -8,8 +8,10 @@ export interface BaseProps {
 
 // Button component props
 export interface ButtonProps extends BaseProps {
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
+  variant?: 'default' | 'outline' | 'secondary' | 'danger';
   size?: 'sm' | 'md' | 'lg';
+  startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
   disabled?: boolean;
   loading?: boolean;
   onClick?: () => void;
@@ -30,4 +32,5 @@ export interface InputProps {
 export interface ModalProps extends BaseProps {
   isOpen: boolean;
   title?: string;
+  onClose: () => void;
 }

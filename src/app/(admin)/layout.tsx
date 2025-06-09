@@ -1,17 +1,19 @@
 "use client";
 
 import { useSidebar } from "@/context/SidebarContext";
-import AppHeader from "@/layout/AppHeader";
+
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import React from "react";
-import Script from "next/script";
+import useAuthInit from '@/hooks/useAuthInit';
+
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  useAuthInit();
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
 
   // Dynamic class for main content margin based on sidebar state
@@ -22,7 +24,7 @@ export default function AdminLayout({
       : "lg:ml-[90px]";
 
   return (
-    <div className="min-h-screen xl:flex">
+    <div className="min-h-screen xl:flex bg-[#fff]">
       {/* Sidebar and Backdrop */}
       <AppSidebar />
       <Backdrop />
@@ -31,12 +33,10 @@ export default function AdminLayout({
         className={`flex-1 transition-all  duration-300 ease-in-out ${mainContentMargin}`}
       >
         {/* Header */}
-        <AppHeader />
         {/* Page Content */}
-        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
+        <div className="mx-auto">{children}</div>
       </div>
-      <div className="zalo-chat-widget" data-oaid="4577223626745863500" data-welcome-message="Heheheheheh" data-autopopup="0" data-width="" data-height=""></div>
-      <Script src="https://sp.zalo.me/plugins/sdk.js" strategy="lazyOnload" />
+      
     </div>
     
   );

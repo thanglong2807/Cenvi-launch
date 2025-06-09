@@ -6,9 +6,8 @@ import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Next.js Buttons | TailAdmin - Next.js Dashboard Template",
-  description:
-    "This is Next.js Buttons page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+  title: "Cenvi Launch - Nút",
+  description: "Quản lý nút Cenvi Launch",
 };
 
 export default function Buttons() {
@@ -18,34 +17,34 @@ export default function Buttons() {
       <div className="space-y-5 sm:space-y-6">
         {/* Primary Button */}
         <ComponentCard title="Primary Button">
-          <div className="flex items-center gap-5">
-            <Button size="sm" variant="primary">
-              Button Text
+          <div className="flex flex-wrap gap-4">
+            <Button size="sm" variant="default">
+              Small
             </Button>
-            <Button size="md" variant="primary">
-              Button Text
+            <Button size="md" variant="default">
+              Medium
             </Button>
           </div>
         </ComponentCard>
         {/* Primary Button with Start Icon */}
         <ComponentCard title="Primary Button with Left Icon">
-          <div className="flex items-center gap-5">
-            <Button size="sm" variant="primary" startIcon={<BoxIcon />}>
-              Button Text
+          <div className="flex flex-wrap gap-4">
+            <Button size="sm" variant="default" startIcon={<BoxIcon />}>
+              Small
             </Button>
-            <Button size="md" variant="primary" startIcon={<BoxIcon />}>
-              Button Text
+            <Button size="md" variant="default" startIcon={<BoxIcon />}>
+              Medium
             </Button>
           </div>
         </ComponentCard>{" "}
         {/* Primary Button with Start Icon */}
         <ComponentCard title="Primary Button with Right Icon">
-          <div className="flex items-center gap-5">
-            <Button size="sm" variant="primary" endIcon={<BoxIcon />}>
-              Button Text
+          <div className="flex flex-wrap gap-4">
+            <Button size="sm" variant="default" endIcon={<BoxIcon />}>
+              Small
             </Button>
-            <Button size="md" variant="primary" endIcon={<BoxIcon />}>
-              Button Text
+            <Button size="md" variant="default" endIcon={<BoxIcon />}>
+              Medium
             </Button>
           </div>
         </ComponentCard>

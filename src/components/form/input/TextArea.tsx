@@ -9,6 +9,7 @@ interface TextareaProps {
   disabled?: boolean; // Disabled state
   error?: boolean; // Error state
   hint?: string; // Hint text to display
+  waperClassName?:string
 }
 
 const TextArea: React.FC<TextareaProps> = ({
@@ -20,6 +21,7 @@ const TextArea: React.FC<TextareaProps> = ({
   disabled = false, // Disabled state
   error = false, // Error state
   hint = "", // Default hint text
+  waperClassName=""
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (onChange) {
@@ -38,7 +40,7 @@ const TextArea: React.FC<TextareaProps> = ({
   }
 
   return (
-    <div className="relative">
+    <div className={`relative ${waperClassName}`}>
       <textarea
         placeholder={placeholder}
         rows={rows}

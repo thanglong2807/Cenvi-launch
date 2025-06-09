@@ -1,11 +1,9 @@
 "use client";
 import React, { useRef, useEffect } from "react";
+import { ModalProps as GlobalModalProps } from "@/types/components";
 
-interface ModalProps {
-  isOpen: boolean;
+interface ModalProps extends GlobalModalProps {
   onClose: () => void;
-  className?: string;
-  children: React.ReactNode;
   showCloseButton?: boolean; // New prop to control close button visibility
   isFullscreen?: boolean; // Default to false for backwards compatibility
 }
@@ -51,7 +49,7 @@ export const Modal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   const contentClasses = isFullscreen
-    ? "w-full h-full"
+    ? "w-full min-h-full flex justify-center items-center bg-[#00000038]"
     : "relative w-full rounded-3xl bg-white  dark:bg-gray-900";
 
   return (

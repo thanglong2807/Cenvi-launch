@@ -27,9 +27,7 @@ export default function NotFound() {
           height={152}
         />
 
-        <p className="mt-10 mb-6 text-base text-gray-700 dark:text-gray-400 sm:text-lg">
-          We can’t seem to find the page you are looking for!
-        </p>
+       
 
         <Link
           href="/"
@@ -39,9 +37,7 @@ export default function NotFound() {
         </Link>
       </div>
       {/* <!-- Footer --> */}
-      <p className="absolute text-sm text-center text-gray-500 -translate-x-1/2 bottom-6 left-1/2 dark:text-gray-400">
-        &copy; {new Date().getFullYear()} - TailAdmin
-      </p>
+      
     </div>
   );
 }

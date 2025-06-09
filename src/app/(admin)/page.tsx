@@ -7,8 +7,7 @@ import RecentOrders from "@/components/ecommerce/RecentOrders";
 
 
 export const metadata: Metadata = {
-  title:
-    "Cenvi Launch - Phần mềm Quản trị doanh nghiệp",
+  title: "Cenvi Launch - Phần mềm Quản trị doanh nghiệp",
   description: "Phần mềm quản lý dành cho Thành lập doanh nghiệp",
 };
 
